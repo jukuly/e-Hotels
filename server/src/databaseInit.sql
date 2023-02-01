@@ -3,8 +3,8 @@ CREATE DATABASE ehotels;
 CREATE TABLE adress (
   id int NOT NULL,
   street_name VARCHAR(20) NOT NULL,
-  street_number INT(5) NOT NULL,
-  apt_number INT(5),
+  street_number INT NOT NULL,
+  apt_number INT,
   city VARCHAR(20) NOT NULL,
   province VARCHAR(20) NOT NULL,
   zip VARCHAR(6) NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE hotel_chain (
   name VARCHAR(20) NOT NULL,
   adress INT NOT NULL,
   email VARCHAR(40) NOT NULL,
-  phone INT(10) NOT NULL,
+  phone INT NOT NULL,
   PRIMARY KEY (name),
   FOREIGN KEY (adress) REFERENCES adress
 );
@@ -23,10 +23,10 @@ CREATE TABLE hotel_chain (
 CREATE TABLE hotel (
   id INT NOT NULL,
   hotel_chain_name VARCHAR(20) NOT NULL,
-  rating INT(1),
+  rating INT,
   adress INT NOT NULL,
   email VARCHAR(40) NOT NULL,
-  phone INT(10) NOT NULL,
+  phone INT NOT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (hotel_chain_name) REFERENCES hotel_chain,
   FOREIGN KEY (adress) REFERENCES adress
@@ -34,7 +34,7 @@ CREATE TABLE hotel (
 
 CREATE TABLE employee (
   email VARCHAR(40) NOT NULL,
-  nas INT(9) NOT NULL,
+  nas INT NOT NULL,
   first_name VARCHAR(20) NOT NULL,
   last_name VARCHAR(20) NOT NULL,
   adress INT NOT NULL,
@@ -49,7 +49,7 @@ CREATE TABLE employee (
 
 CREATE TABLE client (
   email VARCHAR(40) NOT NULL,
-  nas INT(9) NOT NULL,
+  nas INT NOT NULL,
   first_name VARCHAR(20) NOT NULL,
   last_name VARCHAR(20) NOT NULL,
   adress INT NOT NULL,
@@ -64,7 +64,7 @@ CREATE TABLE room (
   id INT NOT NULL,
   price NUMERIC(10, 2) NOT NULL,
   commodities VARCHAR(20)[],
-  capacity INT(1) NOT NULL,
+  capacity INT NOT NULL,
   sea_vue BOOLEAN,
   mountain_vue BOOLEAN,
   extendable BOOLEAN,
@@ -77,9 +77,9 @@ CREATE TABLE room (
 CREATE TABLE reservation (
   id INT NOT NULL,
   room_id INT,
-  client_email INT,
+  client_email VARCHAR(40),
   start_date TIMESTAMP,
-  end_date TIMESTAMP.
+  end_date TIMESTAMP,
   PRIMARY KEY (id),
   FOREIGN KEY (room_id) REFERENCES room,
   FOREIGN KEY (client_email) REFERENCES client
@@ -88,9 +88,9 @@ CREATE TABLE reservation (
 CREATE TABLE location (
   id INT NOT NULL,
   room_id INT,
-  client_email INT,
+  client_email VARCHAR(40),
   start_date TIMESTAMP,
-  end_date TIMESTAMP.
+  end_date TIMESTAMP,
   PRIMARY KEY (id),
   FOREIGN KEY (room_id) REFERENCES room,
   FOREIGN KEY (client_email) REFERENCES client
