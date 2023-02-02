@@ -29,6 +29,12 @@ CREATE TABLE hotel (
   FOREIGN KEY (hotel_chain_name) REFERENCES ehotels.hotel_chain
 );
 
+CREATE TABLE admin (
+  hotel_chain_name VARCHAR(20) NOT NULL PRIMARY KEY,
+  password VARCHAR(20) NOT NULL,
+  FOREIGN KEY (hotel_chain_name) REFERENCES ehotels.hotel_chain
+);
+
 CREATE TABLE employee (
   email VARCHAR(40) NOT NULL PRIMARY KEY,
   nas INT NOT NULL UNIQUE,
@@ -48,7 +54,7 @@ CREATE TABLE client (
   first_name VARCHAR(20) NOT NULL,
   last_name VARCHAR(20) NOT NULL,
   address INT NOT NULL,
-  registration_date TIMESTAMP NOT NULL,
+  registration_date TIMESTAMPTZ NOT NULL,
   password VARCHAR(20) NOT NULL,
   FOREIGN KEY (address) REFERENCES ehotels.address
 );
@@ -71,8 +77,8 @@ CREATE TABLE reservation (
   id SERIAL PRIMARY KEY,
   room_id INT,
   client_email VARCHAR(40),
-  start_date TIMESTAMP,
-  end_date TIMESTAMP,
+  start_date TIMESTAMPTZ,
+  end_date TIMESTAMPTZ,
   FOREIGN KEY (client_email) REFERENCES ehotels.client,
   FOREIGN KEY (room_id) REFERENCES ehotels.room
 );
@@ -81,8 +87,8 @@ CREATE TABLE location (
   id SERIAL PRIMARY KEY,
   room_id INT,
   client_email VARCHAR(40),
-  start_date TIMESTAMP,
-  end_date TIMESTAMP,
+  start_date TIMESTAMPTZ,
+  end_date TIMESTAMPTZ,
   FOREIGN KEY (client_email) REFERENCES ehotels.client,
   FOREIGN KEY (room_id) REFERENCES ehotels.room
 );
