@@ -1,0 +1,98 @@
+.box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  background-color: rgba(255, 255, 255, 0.025);
+  border-radius: 10px;
+  padding: 3rem;
+  color: #ffffff;
+}
+
+.boxTitle {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.signIn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.input {
+  min-width: 30ch;
+  color: inherit;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0;
+  background-color: transparent;
+  border: none;
+  border-bottom: solid #444444 2px;
+  transition: border-color 300ms;
+}
+
+.input:focus {
+  outline: none;
+  border-bottom-color: #540099;
+}
+
+.belowFields {
+  grid-column: span 2;
+  display: flex;
+  justify-content: space-between;
+}
+
+.belowFields span {
+  font-size: 0.75rem;
+  color: red;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border: solid 2px transparent;
+}
+
+.signInButton {
+  align-self: flex-end;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  background-color: transparent;
+  border: solid #444444 2px;
+  color: inherit;
+  cursor: pointer;
+  transition: border-color 300ms;
+}
+
+.signInButton:hover {
+  border-color: #540099;
+}
+
+.signInButton:active {
+  border-width: 3px;
+  padding: calc(0.5rem - 1px) calc(0.75rem - 1px);
+}
+
+.aWrapper {
+  display: grid;
+  place-items: center;
+}
+
+.aWrapper a {
+  color: inherit;
+  text-decoration: none;
+  text-align: center;
+  margin-top: 1.5rem;
+
+  background-image: linear-gradient(#540099, #540099);
+  background-size: 0% 0.1em;
+  background-position-y: 100%;
+  background-position-x: 0%;
+  background-repeat: no-repeat;
+  transition: background-size 150ms ease-in-out;
+}
+
+.aWrapper a:hover {
+  background-size: 100% 0.1em;
+}
+  

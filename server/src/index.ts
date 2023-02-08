@@ -2,11 +2,51 @@ import express from 'express';
 import cors from 'cors';
 import pool from './database';
 import { QueryResult } from 'pg';
+import { signIn, signUp, verifyJWT } from './auth';
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+//AUTHENTICATION/////////////////////////////////////
+
+app.post('/sign-in', async (req, res) => {
+  try {
+    const jwToken = await signIn(req.body); 
+    res.status(200).json({ jwt: jwToken });   
+  } catch (err) {
+    await pool.query('ROLLBACK');
+    console.error(err);
+    res.status(400).json(err);
+  }
+});
+
+app.post('/sign-up', async (req, res) => {
+  try {
+    const jwToken = await signUp(req.body); 
+    res.status(200).json({ jwt: jwToken });   
+  } catch (err) {
+    console.error(err);
+    res.status(400).json(err);
+  }
+});
+
+app.post('/jwt', async (req, res) => {
+  try {
+    const uid = verifyJWT(req.body.jwToken); 
+    res.status(200).json({ uid: uid });   
+  } catch (err) {
+    console.error(err);
+    res.status(400).json(err);
+  }
+});
+
+/////////////////////////////////////////////////////
+
+
+
+
 
 //Create client
 app.post('/client', async (req, res) => {
@@ -24,33 +64,11 @@ app.post('/client', async (req, res) => {
     await addAddress(clientPost.rows[0].id, { ...address });
     await pool.query('COMMIT');
 
-    res.json(clientPost);
+    res.status(200).json(clientPost);
   } catch (err: any) {
     console.error(err.message);
     await pool.query('ROLLBACK');
-  }
-});
-
-//Create employee
-app.post('/employee', async (req, res) => {
-  try {
-    const { email, nas, firstName, lastName, address, hotelId, roles, password } = req.body;
-
-    //Transaction so the address is not inserted if inserting the employee fails
-    await pool.query('BEGIN');
-    const employeePost = await pool.query(
-      `INSERT INTO employee (email, nas, first_name, last_name, hotel_id, roles, registration_date, password) 
-      VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, $7) 
-      RETURNING *`,
-      [email, nas, firstName, lastName, hotelId, roles, password]
-    );
-    await addAddress(employeePost.rows[0].id, { ...address });
-    await pool.query('COMMIT');
-
-    res.json(employeePost);
-  } catch (err: any) {
-    console.error(err.message);
-    await pool.query('ROLLBACK');
+    res.status(400).send(err.message);
   }
 });
 
@@ -397,7 +415,7 @@ app.get('/room', async (req, res) => {
       ${area ? 'WHERE area > $4' : ''}
       ${chainName ? 'WHERE chain_name = $5' : ''}
       ${hotelRating ? 'WHERE hotel_rating > $6' : ''}
-      ${numberOfRoomInHotel ? 'WHERE number_of_room_in_hotel > $7' : ''}
+      ${numberOfRoomInHotel ? 'WHERE (SELECT COUNT(*) FROM room WHERE hotel_id = room.hotel_id) > $7' : ''}
       ${price ? 'WHERE price < $8' : ''}`,
       [startDate, endDate, capacity, area, chainName, hotelRating, numberOfRoomInHotel, price]
     );
@@ -457,3 +475,4 @@ async function deleteAddress(id: number): Promise<QueryResult<any>> {
     [id]
   );
 }
+

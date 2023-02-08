@@ -2,7 +2,7 @@ CREATE DATABASE ehotels;
 
 CREATE TABLE address (
   id UUID NOT NULL PRIMARY KEY,
-  street_name VARCHAR(20) NOT NULL,
+  street_name VARCHAR(40) NOT NULL,
   street_number INT NOT NULL,
   apt_number INT,
   city VARCHAR(20) NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE hotel_chain (
   id UUID DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
   name VARCHAR(20) NOT NULL,
   email VARCHAR(40) NOT NULL,
-  phone INT NOT NULL,
+  phone INT NOT NULL
 );
 
 CREATE TABLE hotel (
@@ -27,9 +27,8 @@ CREATE TABLE hotel (
 );
 
 CREATE TABLE admin (
-  id UUID DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
   hotel_chain_id UUID NOT NULL PRIMARY KEY,
-  password VARCHAR(20) NOT NULL,
+  password VARCHAR NOT NULL,
   FOREIGN KEY (hotel_chain_id) REFERENCES ehotels.hotel_chain
 );
 
@@ -41,7 +40,7 @@ CREATE TABLE employee (
   last_name VARCHAR(20) NOT NULL,
   hotel_id UUID NOT NULL,
   roles VARCHAR(20)[],
-  password VARCHAR(20) NOT NULL,
+  password VARCHAR NOT NULL,
   FOREIGN KEY (hotel_id) REFERENCES ehotels.hotel
 );
 
@@ -52,7 +51,7 @@ CREATE TABLE client (
   first_name VARCHAR(20) NOT NULL,
   last_name VARCHAR(20) NOT NULL,
   registration_date TIMESTAMPTZ NOT NULL,
-  password VARCHAR(20) NOT NULL,
+  password VARCHAR NOT NULL
 );
 
 CREATE TABLE room (
