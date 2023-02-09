@@ -7,8 +7,8 @@ export async function createClient(client: Client): Promise<QueryResult<Client>>
 
   await pool.query('BEGIN');
   const clientCreated = await pool.query(
-    `INSERT INTO client (email, nas, first_name, last_name, registration_date, password) 
-    VALUES ($1, $2, $3, $4, NOW(), $5) 
+    `INSERT INTO client (email, nas, first_name, last_name, password) 
+    VALUES ($1, $2, $3, $4, $5) 
     RETURNING *`,
     [client.email, client.nas, client.firstName, client.lastName, client.password]
   );
@@ -23,8 +23,8 @@ export async function createEmployee(employee: Employee): Promise<QueryResult<Em
 
   await pool.query('BEGIN');
   const employeeCreated = await pool.query(
-    `INSERT INTO employee (email, nas, first_name, last_name, hotel_id, roles, registration_date, password) 
-    VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, $7) 
+    `INSERT INTO employee (email, nas, first_name, last_name, hotel_id, roles, password) 
+    VALUES ($1, $2, $3, $4, $5, $6, $7) 
     RETURNING *`,
     [employee.email, employee.nas, employee.firstName, employee.lastName, employee.hotelId, employee.roles, employee.password]
   );

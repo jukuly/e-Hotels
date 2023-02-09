@@ -50,7 +50,7 @@ CREATE TABLE client (
   nas INT NOT NULL UNIQUE,
   first_name VARCHAR(20) NOT NULL,
   last_name VARCHAR(20) NOT NULL,
-  registration_date TIMESTAMPTZ NOT NULL,
+  registration_date TIMESTAMPTZ DEFAULT NOW(),
   password VARCHAR NOT NULL
 );
 
