@@ -83,7 +83,7 @@ export function useAuthState(): User | null {
   return user;
 }
 
-async function getUser(): Promise<User | null> {
+export async function getUser(): Promise<User | null> {
   const jwt = localStorage.getItem('jwt');
 
   if (!jwt) return null;

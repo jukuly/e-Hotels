@@ -23,13 +23,13 @@ CREATE TABLE hotel (
   rating INT,
   email VARCHAR(40) NOT NULL,
   phone INT NOT NULL,
-  FOREIGN KEY (hotel_chain_id) REFERENCES ehotels.hotel_chain
+  FOREIGN KEY (hotel_chain_id) REFERENCES hotel_chain
 );
 
 CREATE TABLE admin (
   hotel_chain_id UUID NOT NULL PRIMARY KEY,
   password VARCHAR NOT NULL,
-  FOREIGN KEY (hotel_chain_id) REFERENCES ehotels.hotel_chain
+  FOREIGN KEY (hotel_chain_id) REFERENCES hotel_chain
 );
 
 CREATE TABLE employee (
@@ -41,7 +41,7 @@ CREATE TABLE employee (
   hotel_id UUID NOT NULL,
   roles VARCHAR(20)[],
   password VARCHAR NOT NULL,
-  FOREIGN KEY (hotel_id) REFERENCES ehotels.hotel
+  FOREIGN KEY (hotel_id) REFERENCES hotel
 );
 
 CREATE TABLE client (
@@ -65,7 +65,7 @@ CREATE TABLE room (
   issues TEXT[],
   hotel_id UUID NOT NULL,
   area INT NOT NULL,
-  FOREIGN KEY (hotel_id) REFERENCES ehotels.hotel
+  FOREIGN KEY (hotel_id) REFERENCES hotel
 );
 
 CREATE TABLE reservation (
@@ -74,8 +74,8 @@ CREATE TABLE reservation (
   client_id UUID NOT NULL,
   start_date TIMESTAMPTZ NOT NULL,
   end_date TIMESTAMPTZ NOT NULL,
-  FOREIGN KEY (client_id) REFERENCES ehotels.client,
-  FOREIGN KEY (room_id) REFERENCES ehotels.room
+  FOREIGN KEY (client_id) REFERENCES client,
+  FOREIGN KEY (room_id) REFERENCES room
 );
 
 CREATE TABLE location (
@@ -84,6 +84,6 @@ CREATE TABLE location (
   client_id UUID NOT NULL,
   start_date TIMESTAMPTZ DEFAULT NOW(),
   end_date TIMESTAMPTZ NOT NULL,
-  FOREIGN KEY (client_id) REFERENCES ehotels.client,
-  FOREIGN KEY (room_id) REFERENCES ehotels.room
+  FOREIGN KEY (client_id) REFERENCES client,
+  FOREIGN KEY (room_id) REFERENCES room
 );

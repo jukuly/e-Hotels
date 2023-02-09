@@ -36,4 +36,5 @@ export interface Address {
 
 export interface User {
   uid: string
+  type?: 'client' | 'employee' | 'admin'
 }

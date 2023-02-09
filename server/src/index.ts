@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import pool from './database';
 import { QueryResult } from 'pg';
-import { signIn, signUp, verifyJWT } from './auth';
+import { getUserType, signIn, signUp, verifyJWT } from './auth';
 
 const app = express();
 
@@ -35,7 +35,9 @@ app.post('/sign-up', async (req, res) => {
 app.post('/jwt', async (req, res) => {
   try {
     const uid = verifyJWT(req.body.jwToken); 
-    res.status(200).json({ uid: uid });   
+    const type = getUserType(uid);
+
+    res.status(200).json({ uid: uid, type: type });   
   } catch (err) {
     console.error(err);
     res.status(400).json(err);

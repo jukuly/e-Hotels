@@ -44,7 +44,7 @@ export async function signUp(params: Client): Promise<any> {
   }
 }
 
-export function verifyJWT(jwToken: string): Promise<string> {
+export function verifyJWT(jwToken: string): string {
   try {
     const decoded = jwt.verify(jwToken, process.env.JWT_KEY!);
     return (decoded as jwt.JwtPayload)['id'];
@@ -55,6 +55,26 @@ export function verifyJWT(jwToken: string): Promise<string> {
       throw err;
     }
   }
+}
+
+export async function getUserType(uid: string): Promise<string | undefined> {
+  let type;
+  if ((await pool.query<{ password: string, id: string }>(
+    `SELECT COUNT(*) FROM client 
+    WHERE id = $1`,
+    [uid]
+  )).rowCount > 0) type = 'client';
+  if ((await pool.query<{ password: string, id: string }>(
+    `SELECT COUNT(*) FROM employee 
+    WHERE id = $1`,
+    [uid]
+  )).rowCount > 0) type = 'employee';
+  if ((await pool.query<{ password: string, id: string }>(
+    `SELECT COUNT(*) FROM admin 
+    WHERE hotel_chain_id = $1`,
+    [uid]
+  )).rowCount > 0) type = 'admin';
+  return type;
 }
 
 async function createJWT(id: string, exp: string) {

@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import styles from './signIn.module.css'
-import { signInEmailPassword, useAuthState } from '../../auth/auth';
+import { signInEmailPassword } from '../../auth/auth';
 import { useNavigate } from 'react-router-dom';
 
 export default function () {
@@ -10,8 +10,6 @@ export default function () {
   const passwordRef = useRef<HTMLInputElement>(null);
 
   const navigate = useNavigate();
-
-  const user = useAuthState();
 
   async function signIn() {
     try {
