@@ -415,8 +415,14 @@ app.get('/room', async (req, res) => {
       }
       ${capacity ? 'WHERE capacity > $3' : ''}
       ${area ? 'WHERE area > $4' : ''}
-      ${chainName ? 'WHERE (SELECT name FROM hotel_chain WHERE id = (SELECT hotel_chain_id FROM hotel WHERE id = room.hotel_id)) = $5' : ''}
-      ${hotelRating ? 'WHERE (SELECT rating FROM hotel WHERE id = room.hotel_id) > $6' : ''}
+      ${chainName ? `WHERE (
+        SELECT name FROM hotel_chain 
+        WHERE id = (
+          SELECT hotel_chain_id FROM hotel 
+          WHERE id = room.hotel_id
+        )
+      ) = $5` : ''}
+      ${hotelRating ? `WHERE (SELECT rating FROM hotel WHERE id = room.hotel_id) > $6` : ''}
       ${numberOfRoomInHotel ? 'WHERE (SELECT COUNT(*) FROM room WHERE hotel_id = room.hotel_id) > $7' : ''}
       ${price ? 'WHERE price < $8' : ''}`,
       [startDate, endDate, capacity, area, chainName, hotelRating, numberOfRoomInHotel, price]

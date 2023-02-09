@@ -14,7 +14,8 @@ CREATE TABLE hotel_chain (
   id UUID DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
   name VARCHAR(20) NOT NULL,
   email VARCHAR(40) NOT NULL,
-  phone INT NOT NULL
+  phone INT NOT NULL,
+  CHECK (email ~ '^[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*([.][a-zA-Z]{2,3})+$')
 );
 
 CREATE TABLE hotel (
@@ -23,13 +24,14 @@ CREATE TABLE hotel (
   rating INT,
   email VARCHAR(40) NOT NULL,
   phone INT NOT NULL,
-  FOREIGN KEY (hotel_chain_id) REFERENCES hotel_chain
+  FOREIGN KEY (hotel_chain_id) REFERENCES hotel_chain ON UPDATE CASCADE,
+  CHECK (email ~ '^[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*([.][a-zA-Z]{2,3})+$')
 );
 
 CREATE TABLE admin (
   hotel_chain_id UUID NOT NULL PRIMARY KEY,
   password VARCHAR NOT NULL,
-  FOREIGN KEY (hotel_chain_id) REFERENCES hotel_chain
+  FOREIGN KEY (hotel_chain_id) REFERENCES hotel_chain ON UPDATE CASCADE
 );
 
 CREATE TABLE employee (
@@ -41,7 +43,8 @@ CREATE TABLE employee (
   hotel_id UUID NOT NULL,
   roles VARCHAR(20)[],
   password VARCHAR NOT NULL,
-  FOREIGN KEY (hotel_id) REFERENCES hotel
+  FOREIGN KEY (hotel_id) REFERENCES hotel ON UPDATE CASCADE,
+  CHECK (email ~ '^[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*([.][a-zA-Z]{2,3})+$')
 );
 
 CREATE TABLE client (
@@ -51,7 +54,8 @@ CREATE TABLE client (
   first_name VARCHAR(20) NOT NULL,
   last_name VARCHAR(20) NOT NULL,
   registration_date TIMESTAMPTZ NOT NULL,
-  password VARCHAR NOT NULL
+  password VARCHAR NOT NULL,
+  CHECK (email ~ '^[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*([.][a-zA-Z]{2,3})+$')
 );
 
 CREATE TABLE room (
@@ -65,7 +69,7 @@ CREATE TABLE room (
   issues TEXT[],
   hotel_id UUID NOT NULL,
   area INT NOT NULL,
-  FOREIGN KEY (hotel_id) REFERENCES hotel
+  FOREIGN KEY (hotel_id) REFERENCES hotel ON UPDATE CASCADE
 );
 
 CREATE TABLE reservation (
@@ -74,8 +78,9 @@ CREATE TABLE reservation (
   client_id UUID NOT NULL,
   start_date TIMESTAMPTZ NOT NULL,
   end_date TIMESTAMPTZ NOT NULL,
-  FOREIGN KEY (client_id) REFERENCES client,
-  FOREIGN KEY (room_id) REFERENCES room
+  FOREIGN KEY (client_id) REFERENCES client ON UPDATE CASCADE,
+  FOREIGN KEY (room_id) REFERENCES room ON UPDATE CASCADE,
+  CHECK (end_date >= start_date)
 );
 
 CREATE TABLE location (
@@ -84,6 +89,7 @@ CREATE TABLE location (
   client_id UUID NOT NULL,
   start_date TIMESTAMPTZ DEFAULT NOW(),
   end_date TIMESTAMPTZ NOT NULL,
-  FOREIGN KEY (client_id) REFERENCES client,
-  FOREIGN KEY (room_id) REFERENCES room
+  FOREIGN KEY (client_id) REFERENCES client ON UPDATE CASCADE,
+  FOREIGN KEY (room_id) REFERENCES room ON UPDATE CASCADE,
+  CHECK (end_date >= start_date)
 );
