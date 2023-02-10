@@ -14,3 +14,61 @@
   color: #ffffff;
   max-height: calc(100% - 3rem);
 }
+
+.boxTitle {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.profile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.inputGroup {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.input {
+  min-width: 30ch;
+}
+
+.belowFields {
+  grid-column: span 4;
+  display: flex;
+  justify-content: space-between;
+}
+
+.belowFields span {
+  font-size: 0.75rem;
+  color: red;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border: solid 2px transparent;
+}
+
+.saveButton {
+  align-self: flex-end;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  background-color: transparent;
+  border: solid #444444 2px;
+  color: inherit;
+  cursor: pointer;
+  transition: border-color 300ms;
+}
+
+.saveButton:hover {
+  border-color: #540099;
+}
+
+.saveButton:active {
+  border-width: 3px;
+  padding: calc(0.5rem - 1px) calc(0.75rem - 1px);
+}
+

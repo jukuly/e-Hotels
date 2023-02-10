@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import styles from './signIn.module.css'
-import { signInEmailPassword } from '../../auth/auth';
+import { getUser, signInEmailPassword } from '../../database/auth';
 import { useNavigate } from 'react-router-dom';
 
 export default function () {
@@ -14,11 +14,15 @@ export default function () {
   async function signIn() {
     try {
       await signInEmailPassword(emailRef.current?.value, passwordRef.current?.value);
+      emailRef.current?.classList.remove('error');
+      passwordRef.current?.classList.remove('error');
       setError('');
-      navigate('/client');
+      navigate(`/${(await getUser())?.type}`);
     } catch (err: any) {
       if (err.code === 'missing-credentials' || err.code === 'invalid-credentials') {
         setError('Username or password incorrect');
+        emailRef.current?.classList.add('error');
+        passwordRef.current?.classList.add('error');
       } else {
         console.error(err);
       }

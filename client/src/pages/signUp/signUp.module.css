@@ -37,21 +37,6 @@
   grid-column: span 1;
 }
 
-.input {
-  color: inherit;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0;
-  background-color: transparent;
-  border: none;
-  border-bottom: solid #444444 2px;
-  transition: border-color 300ms;
-}
-
-.input:focus {
-  outline: none;
-  border-bottom-color: #540099;
-}
-
 .belowFields {
   grid-column: span 4;
   display: flex;
@@ -108,9 +93,5 @@
 
 .aWrapper a:hover {
   background-size: 100% 0.1em;
-}
-
-.input.error {
-  border-color: red;
 }
   

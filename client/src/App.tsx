@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { useAuthState } from './auth/auth';
+import { useAuthState } from './database/auth';
 import NotSignedIn from './guards/notSignedIn';
 import SignedIn from './guards/signedIn';
 import Admin from './pages/admin/admin';

@@ -12,9 +12,9 @@ CREATE TABLE address (
 
 CREATE TABLE hotel_chain (
   id UUID DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
-  name VARCHAR(20) NOT NULL,
-  email VARCHAR(40) NOT NULL,
-  phone INT NOT NULL,
+  name VARCHAR(20) NOT NULL UNIQUE,
+  email VARCHAR(40) NOT NULL UNIQUE,
+  phone BIGINT NOT NULL UNIQUE,
   CHECK (email ~ '^[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*([.][a-zA-Z]{2,3})+$')
 );
 
@@ -23,7 +23,7 @@ CREATE TABLE hotel (
   hotel_chain_id UUID NOT NULL,
   rating INT,
   email VARCHAR(40) NOT NULL,
-  phone INT NOT NULL,
+  phone BIGINT NOT NULL,
   FOREIGN KEY (hotel_chain_id) REFERENCES hotel_chain ON UPDATE CASCADE,
   CHECK (email ~ '^[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*([.][a-zA-Z]{2,3})+$')
 );
@@ -63,9 +63,9 @@ CREATE TABLE room (
   price NUMERIC(10, 2) NOT NULL,
   commodities VARCHAR(20)[],
   capacity INT NOT NULL,
-  sea_vue BOOLEAN,
-  mountain_vue BOOLEAN,
-  extendable BOOLEAN,
+  sea_vue BOOLEAN DEFAULT 0,
+  mountain_vue BOOLEAN DEFAULT 0,
+  extendable BOOLEAN DEFAULT 0,
   issues TEXT[],
   hotel_id UUID NOT NULL,
   area INT NOT NULL,

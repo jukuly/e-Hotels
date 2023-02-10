@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Client, ErrorWithCode, User } from '../types/interfaces';
 
-export async function signInEmailPassword(email: string | undefined, password: string | undefined) {
+export async function signInEmailPassword(email: string | undefined, password: string | undefined): Promise<{ jwt: string }> {
   if (!email || !password) {
     const error: ErrorWithCode = new Error('Email and/or password missing')
     error.code = 'missing-credentials';
@@ -34,7 +34,7 @@ export async function signInEmailPassword(email: string | undefined, password: s
   }
 }
 
-export async function signUpEmailPassword(newClient: Client) {
+export async function signUpEmailPassword(newClient: Client): Promise<{ jwt: string }> {
   try {
     const response = await fetch('http://localhost:5000/sign-up', {
       method: 'POST',
@@ -107,7 +107,7 @@ export async function getUser(): Promise<User | null> {
       throw error;
     }
 
-    return { uid: responseData.uid};
+    return { uid: responseData.uid, type: responseData.type };
   } catch (err: any) {
     console.error(err)
     return null;

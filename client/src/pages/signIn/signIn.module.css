@@ -24,18 +24,6 @@
 
 .input {
   min-width: 30ch;
-  color: inherit;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0;
-  background-color: transparent;
-  border: none;
-  border-bottom: solid #444444 2px;
-  transition: border-color 300ms;
-}
-
-.input:focus {
-  outline: none;
-  border-bottom-color: #540099;
 }
 
 .belowFields {

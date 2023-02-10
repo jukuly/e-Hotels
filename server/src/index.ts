@@ -1,8 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import pool from './database';
-import { QueryResult } from 'pg';
-import { getUserType, signIn, signUp, verifyJWT } from './auth';
+import { getUserType, hashPassword, isAuthorized, signIn, signUp, verifyJWT } from './auth';
+import { updateHotelChain } from './editTable';
+import { getHotelChain } from './selectTable';
 
 const app = express();
 
@@ -35,7 +36,7 @@ app.post('/sign-up', async (req, res) => {
 app.post('/jwt', async (req, res) => {
   try {
     const uid = verifyJWT(req.body.jwToken); 
-    const type = getUserType(uid);
+    const type = await getUserType(uid);
 
     res.status(200).json({ uid: uid, type: type });   
   } catch (err) {
@@ -46,33 +47,41 @@ app.post('/jwt', async (req, res) => {
 
 /////////////////////////////////////////////////////
 
+//PROFILE UPDATE/////////////////////////////////////
 
-
-
-
-//Create client
-app.post('/client', async (req, res) => {
+app.post('/update-hotel-chain', async (req, res) => {
   try {
-    const { email, nas, firstName, lastName, address, password } = req.body;
+    const uid = await isAuthorized(req, 'admin');
+    if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
+    const hotelChain = await updateHotelChain({ id: uid, ...req.body });
 
-    //Transaction so the address is not inserted if inserting the client fails
-    await pool.query('BEGIN');
-    const clientPost = await pool.query(
-      `INSERT INTO client (email, nas, first_name, last_name, registration_date, password) 
-      VALUES ($1, $2, $3, $4, NOW(), $5) 
-      RETURNING *`,
-      [email, nas, firstName, lastName, password]
-    );
-    await addAddress(clientPost.rows[0].id, { ...address });
-    await pool.query('COMMIT');
-
-    res.status(200).json(clientPost);
-  } catch (err: any) {
-    console.error(err.message);
-    await pool.query('ROLLBACK');
-    res.status(400).send(err.message);
+    res.status(200).json(hotelChain.rows[0]);   
+  } catch (err) {
+    console.error(err);
+    res.status(400).json(err);
   }
 });
+
+/////////////////////////////////////////////////////
+
+//GETTER/////////////////////////////////////////////
+
+app.get('/hotel_chain', async (req, res) => {
+  try {
+    const uid = await isAuthorized(req, 'admin');
+    if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
+    const hotelChain = await getHotelChain(uid as string);
+
+    res.status(200).json(hotelChain.rows[0]);   
+  } catch (err) {
+    console.error(err);
+    res.status(400).json(err);
+  }
+});
+
+/////////////////////////////////////////////////////
+
+
 
 //Update client
 app.put('/client/:id', async (req, res) => {
@@ -82,7 +91,7 @@ app.put('/client/:id', async (req, res) => {
 
     //Transaction so the address is not updated if updating the client fails
     await pool.query('BEGIN');
-    if (address) await updateAddress(id, { ...address });
+    //if (address) await updateAddress(id, { ...address });
     const clientUpdate = await pool.query(
       `UPDATE client
       SET
@@ -111,7 +120,7 @@ app.put('/employee/:id', async (req, res) => {
 
     //Transaction so the address is not updated if updating the employee fails
     await pool.query('BEGIN');
-    if (address) await updateAddress(id, { ...address });
+    //if (address) await updateAddress(id, { ...address });
     const employeeUpdate = await pool.query(
       `UPDATE employee
       SET
@@ -145,7 +154,7 @@ app.delete('/client/:id', async (req, res) => {
       WHERE id = $1`,
       [id]
     );
-    await deleteAddress(id);
+    //await deleteAddress(id);
     await pool.query('COMMIT');
 
     res.json(clientDelete);
@@ -167,7 +176,7 @@ app.delete('/employee/:id', async (req, res) => {
       WHERE id = $1`,
       [id]
     );
-    await deleteAddress(id);
+    //await deleteAddress(id);
     await pool.query('COMMIT');
 
     res.json(employeeDelete);
@@ -317,7 +326,7 @@ app.post('/hotel', async (req, res) => {
       RETURNING *`,
       [hotelChainId, rating, email, phone]
     );
-    await addAddress(hotelPost.rows[0].id, { ...address });
+    //await addAddress(hotelPost.rows[0].id, { ...address });
     await pool.query('COMMIT');
 
     res.json(hotelPost);
@@ -336,7 +345,7 @@ app.put('/hotel/:id', async (req, res) => {
     //Transaction so the address is not inserted if updating the hotel fails
     await pool.query('BEGIN');
     if (address) {
-      await updateAddress(id, { ...address });
+      //await updateAddress(id, { ...address });
     }
     const hotelUpdate = await pool.query(
       `UPDATE hotel
@@ -369,7 +378,7 @@ app.delete('/hotel/:id', async (req, res) => {
       WHERE id = $1`,
       [id]
     );
-    await deleteAddress(id);
+    //await deleteAddress(id);
     await pool.query('COMMIT');
 
     res.json(hotelDelete);
@@ -436,51 +445,4 @@ app.get('/room', async (req, res) => {
 
 app.listen(5000, () => console.log('Listening on port 5000'));
 
-async function addAddress(
-  id: number,
-  address : 
-  {
-    streetName: string, 
-    streetNumber: string, 
-    aptNumber: number, 
-    city: string, 
-    province: string, 
-    zip: string
-  }
-): Promise<QueryResult<{id: number}>> {
-  return await pool.query(
-    `INSERT INTO address (id, street_name, street_number, apt_number, city, province, zip) 
-    VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-    [id, ...Object.values(address)]
-  );
-}
-
-async function updateAddress(
-  id: number,
-  address : 
-  {
-    streetName: string, 
-    streetNumber: string, 
-    aptNumber: number, 
-    city: string, 
-    province: string, 
-    zip: string,
-    id: number
-  }
-): Promise<QueryResult<any>> {
-  return await pool.query(
-    `UPDATE address
-    SET street_name = $2, street_number = $3, apt_number = $4, city = $5, province = $6, zip = $7
-    WHERE id = $1`,
-    [id, ...Object.values(address)]
-  );
-}
-
-async function deleteAddress(id: number): Promise<QueryResult<any>> {
-  return await pool.query(
-    `DELETE FROM address
-    WHERE id = $1`,
-    [id]
-  );
-}
 

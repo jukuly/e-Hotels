@@ -1,6 +1,6 @@
 import { QueryResult } from 'pg';
 import pool from './database';
-import { Address, Client, Employee } from './types/interfaces';
+import { Address, Client, Employee, HotelChain } from './types/interfaces';
 
 //Create client
 export async function createClient(client: Client): Promise<QueryResult<Client>> {
@@ -32,6 +32,27 @@ export async function createEmployee(employee: Employee): Promise<QueryResult<Em
   await pool.query('COMMIT');
 
   return employeeCreated;
+}
+
+//Update hotel chain
+export async function updateHotelChain(hotelChain: HotelChain): Promise<QueryResult<HotelChain>> {
+  try {
+    return await pool.query<HotelChain>(
+      `UPDATE hotel_chain
+        SET
+          ${hotelChain.name ? 'name = $2,' : ''}
+          ${hotelChain.email ? 'email = $3,' : ''}
+          ${hotelChain.phone ? 'phone = $4' : ''}
+        WHERE id = $1
+        RETURNING *`,
+      [hotelChain.id, hotelChain.name, hotelChain.email, hotelChain.phone]
+    );
+  } catch (err: any) {
+    if (err.code === '23505') {
+      throw { code: 'user-already-exists', message: 'This NAS and/or email is already taken', error: err };
+    }
+    throw { code: 'unknown', message: 'Unexpected error', error: err };
+  }
 }
 
 //Create address

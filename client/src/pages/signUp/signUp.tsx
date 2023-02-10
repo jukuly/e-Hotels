@@ -1,63 +1,8 @@
-import { RefObject, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signUpEmailPassword } from '../../auth/auth';
+import { signUpEmailPassword } from '../../database/auth';
+import { isFilled, isEmailValid, isPasswordValid, isPasswordConfirmValid, isNumber } from '../../helperFunctions/inputCheck';
 import styles from './signUp.module.css'
-
-function isNumber(inputRef: RefObject<HTMLInputElement>): boolean {
-  const value = inputRef.current?.value.trim();
-  if (isNaN(parseInt(value!)) || !isFinite(parseInt(value!)) || 
-    parseInt(value!) !== parseFloat(value!)) {
-    inputRef.current?.classList.add(styles.error);
-    return false;
-  } else {
-    inputRef.current?.classList.remove(styles.error);
-    return true;
-  }
-}
-
-function isFilled(inputRef: RefObject<HTMLInputElement>): boolean {
-  const value = inputRef.current?.value.trim();
-  if (!inputRef.current || !value) {
-    inputRef.current?.classList.add(styles.error);
-    return false;
-  } else {
-    inputRef.current?.classList.remove(styles.error);
-    return true;
-  }
-}
-
-function isEmailValid(emailRef: RefObject<HTMLInputElement>): boolean {
-  const value = emailRef.current?.value.trim();
-  if (!value!.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)) {
-    emailRef.current?.classList.add(styles.error);
-    return false;
-  } else {
-    emailRef.current?.classList.remove(styles.error);
-    return true;
-  }
-}
-
-function isPasswordValid(passwordRef: RefObject<HTMLInputElement>): boolean {
-
-  //length: 8-16, normal & capital letter, number and symbol: [!, ", #, $, %, &, ', (, ), *, +, ,, -, ., /, :, ;, <, =, >, ?, @, ^, _, `, {, |, }, ~] 
-  if (!passwordRef.current?.value.match(/^(?=.*[0-9])(?=.*[!"#$%&'()*+\,\-\./:;<=>?@^_`{|}~])[a-zA-Z0-9!"#$%&'()*+\,\-\./:;<=>?@^_`{|}~]{8,16}$/)) {
-    passwordRef.current?.classList.add(styles.error);
-    return false;
-  } else {
-    passwordRef.current?.classList.remove(styles.error);
-    return true;
-  }
-}
-
-function isPasswordConfirmValid(passwordRef: RefObject<HTMLInputElement>, passwordConfirmRef: RefObject<HTMLInputElement>): boolean {
-  if (passwordConfirmRef.current?.value !== passwordRef.current!.value) {
-    passwordConfirmRef.current?.classList.add(styles.error);
-    return false;
-  } else {
-    passwordConfirmRef.current?.classList.remove(styles.error);
-    return true;
-  }
-}
 
 export default function () {
   const [error, setError] = useState<string>('');
@@ -149,20 +94,20 @@ export default function () {
           e.preventDefault();
           signUp();
         }}>
-          <input className={`${styles.two} ${styles.input}`} type='text' placeholder='First Name *' size={1} ref={firstNameRef} onChange={() => isFilled(firstNameRef)} />
-          <input className={`${styles.two} ${styles.input}`} type='text' placeholder='Last Name *' size={1} ref={lastNameRef} onChange={() => isFilled(lastNameRef)} />
-          <input className={styles.input} type='text' placeholder='Email *' size={1} ref={emailRef} onChange={() => isEmailValid(emailRef)} />
-          <input className={styles.input} type='text' placeholder='NAS *' size={1} ref={nasRef} onChange={() => isNumber(nasRef)} />
+          <input className={styles.two} type='text' placeholder='First Name *' size={1} ref={firstNameRef} onChange={() => isFilled(firstNameRef)} maxLength={20} />
+          <input className={styles.two} type='text' placeholder='Last Name *' size={1} ref={lastNameRef} onChange={() => isFilled(lastNameRef)} maxLength={20} />
+          <input type='text' placeholder='Email *' size={1} ref={emailRef} onChange={() => isEmailValid(emailRef)} maxLength={40} />
+          <input type='text' placeholder='NAS *' size={1} ref={nasRef} onChange={() => isNumber(nasRef)} maxLength={9} />
 
-          <input className={`${styles.one} ${styles.input}`} type='text' placeholder='Number *' size={1} ref={streetNumberRef} onChange={() => isNumber(streetNumberRef)} />
-          <input className={`${styles.two} ${styles.input}`} type='text' placeholder='Street *' size={1} ref={streetNameRef} onChange={() => isFilled(streetNameRef)} />
-          <input className={`${styles.one} ${styles.input}`} type='text' placeholder='Apt' size={1} ref={aptNumberRef} onChange={() => isNumber(aptNumberRef)} />
-          <input className={`${styles.two} ${styles.input}`} type='text' placeholder='City *' size={1} ref={cityRef} onChange={() => isFilled(cityRef)} />
-          <input className={`${styles.two} ${styles.input}`} type='text' placeholder='Province *' size={1} ref={provinceRef} onChange={() => isFilled(provinceRef)} />
-          <input className={styles.input} type='text' placeholder='Zip Code *' size={1} ref={zipCodeRef} onChange={() => isFilled(zipCodeRef)} />
+          <input className={styles.one} type='text' placeholder='Number *' size={1} ref={streetNumberRef} onChange={() => isNumber(streetNumberRef)} />
+          <input className={styles.two} type='text' placeholder='Street *' size={1} ref={streetNameRef} onChange={() => isFilled(streetNameRef)} maxLength={40} />
+          <input className={styles.one} type='text' placeholder='Apt' size={1} ref={aptNumberRef} onChange={() => isNumber(aptNumberRef)} />
+          <input className={styles.two} type='text' placeholder='City *' size={1} ref={cityRef} onChange={() => isFilled(cityRef)} maxLength={20} />
+          <input className={styles.two} type='text' placeholder='Province *' size={1} ref={provinceRef} onChange={() => isFilled(provinceRef)} maxLength={20} />
+          <input type='text' placeholder='Zip Code *' size={1} ref={zipCodeRef} onChange={() => isFilled(zipCodeRef)} maxLength={7} />
 
-          <input className={styles.input} type='password' placeholder='Password *' size={1} ref={passwordRef} onChange={() => isPasswordValid(passwordRef)} />
-          <input className={styles.input} type='password' placeholder='Confirm Password *' size={1} ref={passwordConfirRef} onChange={() => isPasswordConfirmValid(passwordRef, passwordConfirRef)} />
+          <input type='password' placeholder='Password *' size={1} ref={passwordRef} onChange={() => isPasswordValid(passwordRef)} maxLength={16} />
+          <input type='password' placeholder='Confirm Password *' size={1} ref={passwordConfirRef} onChange={() => isPasswordConfirmValid(passwordRef, passwordConfirRef)} maxLength={16} />
           <div className={styles.belowFields}>
             <span>{ error }</span>
             <button className={styles.signUpButton} type='submit'>Sign Up</button>
