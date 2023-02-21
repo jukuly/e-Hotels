@@ -72,7 +72,7 @@ export async function getUserType(uid: string): Promise<'client' | 'employee' | 
     [uid]
   )).rows[0].count > 0) type = 'employee';
   if ((await pool.query<{ count: number }>(
-    `SELECT COUNT(*) FROM hotel-chain 
+    `SELECT COUNT(*) FROM hotel_chain 
     WHERE id = $1`,
     [uid]
   )).rows[0].count > 0) type = 'hotel-chain';

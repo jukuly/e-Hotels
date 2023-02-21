@@ -40,7 +40,8 @@ export interface Hotel {
   hotelChainId?: string,
   rating?: number,
   email?: string, 
-  phone?: number
+  phone?: number,
+  address?: Address
 }
 
 export interface HotelChain {

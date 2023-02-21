@@ -13,7 +13,7 @@ export default function () {
 
   async function signIn() {
     try {
-      await signInEmailPassword(emailRef.current?.value, passwordRef.current?.value);
+      await signInEmailPassword(emailRef.current?.value.toLowerCase().trim(), passwordRef.current?.value);
       emailRef.current?.classList.remove('error');
       passwordRef.current?.classList.remove('error');
       setError('');
