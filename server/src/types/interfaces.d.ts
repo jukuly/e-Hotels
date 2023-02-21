@@ -21,12 +21,6 @@ export interface Employee {
   password: string
 }
 
-export interface Admin {
-  id?: string,
-  hotelChainId: string,
-  password: string
-}
-
 export interface Address {
   id?: string,
   streetName: string, 
@@ -49,7 +43,8 @@ export interface HotelChain {
   id?: string,
   name: string,
   email: string,
-  phone: number
+  phone: number,
+  password: string
 }
 
 export interface Room {

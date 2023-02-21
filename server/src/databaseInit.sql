@@ -15,6 +15,7 @@ CREATE TABLE hotel_chain (
   name VARCHAR(20) NOT NULL UNIQUE,
   email VARCHAR(40) NOT NULL UNIQUE,
   phone BIGINT NOT NULL UNIQUE,
+  password VARCHAR NOT NULL,
   CHECK (email ~ '^[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*([.][a-zA-Z]{2,3})+$')
 );
 
@@ -26,12 +27,6 @@ CREATE TABLE hotel (
   phone BIGINT NOT NULL,
   FOREIGN KEY (hotel_chain_id) REFERENCES hotel_chain ON UPDATE CASCADE,
   CHECK (email ~ '^[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*([.][a-zA-Z]{2,3})+$')
-);
-
-CREATE TABLE admin (
-  hotel_chain_id UUID NOT NULL PRIMARY KEY,
-  password VARCHAR NOT NULL,
-  FOREIGN KEY (hotel_chain_id) REFERENCES hotel_chain ON UPDATE CASCADE
 );
 
 CREATE TABLE employee (

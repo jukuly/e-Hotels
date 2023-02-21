@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { isFilled, isEmailValid, isPhoneValid } from '../../helperFunctions/inputCheck';
 import { saveProfileHotelChain } from '../../database/profileChange';
-import styles from './admin.module.css'
+import styles from './hotelChain.module.css'
 import { getProfileHotelChain } from '../../database/getter';
 
 export default function () {
@@ -54,7 +54,7 @@ export default function () {
       await saveProfileHotelChain(params);
       setError('');
     } catch (err: any) {
-      if (err.code === 'user-already-exists') {
+      if (err.code === 'hotel-chain-already-exists') {
         setError('This name and/or email and/or phone number is already taken');
       } else {
         console.error(err);
@@ -64,7 +64,7 @@ export default function () {
   
   return (
     <>
-      <main className={styles.adminHome}>
+      <main className={styles.hotelChainHome}>
         <div className={styles.box}>
           <h1 className={styles.boxTitle}>Hotel Chain Info</h1>
           <form className={styles.profile} onSubmit={e => {

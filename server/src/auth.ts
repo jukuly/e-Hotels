@@ -14,15 +14,15 @@ export async function signIn({ email, password }: { email: string, password: str
     SELECT password, id FROM employee 
     WHERE email = $1
     UNION
-    SELECT password, hotel_chain_id FROM admin 
-    WHERE hotel_chain_id = (SELECT id FROM hotel_chain WHERE email = $1)`,
+    SELECT password, id FROM hotel_chain 
+    WHERE email = $1`,
     [email]
   );
 
-  if (userData.rowCount === 0) throw { code: 'invalid-credentials', message: 'Email or Passwod incorrect' };
+  if (userData.rowCount === 0) throw { code: 'invalid-credentials', message: 'Email or Password incorrect' };
   if (await bcrypt.compare(password, userData.rows[0].password)) return createJWT(userData.rows[0].id, '2h');
   
-  throw { code: 'invalid-credentials', message: 'Email or Passwod incorrect' };
+  throw { code: 'invalid-credentials', message: 'Email or Password incorrect' };
 }
 
 export async function signUp(params: Client): Promise<any> {
@@ -59,8 +59,8 @@ export function verifyJWT(jwToken: string | undefined): string {
   }
 }
 
-export async function getUserType(uid: string): Promise<'client' | 'employee' | 'admin' | undefined> {
-  let type: 'client' | 'employee' | 'admin' | undefined;
+export async function getUserType(uid: string): Promise<'client' | 'employee' | 'hotel-chain' | undefined> {
+  let type: 'client' | 'employee' | 'hotel-chain' | undefined;
   if ((await pool.query<{ count: number }>(
     `SELECT COUNT(*) FROM client 
     WHERE id = $1`,
@@ -72,15 +72,15 @@ export async function getUserType(uid: string): Promise<'client' | 'employee' | 
     [uid]
   )).rows[0].count > 0) type = 'employee';
   if ((await pool.query<{ count: number }>(
-    `SELECT COUNT(*) FROM admin 
-    WHERE hotel_chain_id = $1`,
+    `SELECT COUNT(*) FROM hotel-chain 
+    WHERE id = $1`,
     [uid]
-  )).rows[0].count > 0) type = 'admin';
+  )).rows[0].count > 0) type = 'hotel-chain';
 
   return type;
 }
 
-export async function isAuthorized(request: Request, userType: 'client' | 'employee' | 'admin'): Promise<string | boolean> {
+export async function isAuthorized(request: Request, userType: 'client' | 'employee' | 'hotel-chain'): Promise<string | boolean> {
   try { 
     const uid = verifyJWT(request.header('Authorization')?.split(' ')[1]); 
     const type = await getUserType(uid);

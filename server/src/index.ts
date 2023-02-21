@@ -51,7 +51,7 @@ app.post('/jwt', async (req, res) => {
 
 app.post('/update-hotel-chain', async (req, res) => {
   try {
-    const uid = await isAuthorized(req, 'admin');
+    const uid = await isAuthorized(req, 'hotel-chain');
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
     const hotelChain = await updateHotelChain({ id: uid, ...req.body });
 
@@ -68,7 +68,7 @@ app.post('/update-hotel-chain', async (req, res) => {
 
 app.get('/hotel_chain', async (req, res) => {
   try {
-    const uid = await isAuthorized(req, 'admin');
+    const uid = await isAuthorized(req, 'hotel-chain');
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
     const hotelChain = await getHotelChain(uid as string);
 

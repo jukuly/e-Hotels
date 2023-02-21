@@ -49,7 +49,7 @@ export async function updateHotelChain(hotelChain: HotelChain): Promise<QueryRes
     );
   } catch (err: any) {
     if (err.code === '23505') {
-      throw { code: 'user-already-exists', message: 'This NAS and/or email is already taken', error: err };
+      throw { code: 'hotel-chain-already-exists', message: 'This NAS and/or email is already taken', error: err };
     }
     throw { code: 'unknown', message: 'Unexpected error', error: err };
   }

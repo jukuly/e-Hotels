@@ -11,8 +11,8 @@ export default function({ user, children }: { user: User | null, children: any }
       return <Navigate to='/client' />
     case 'employee':
       return <Navigate to='/employee' />
-    case 'admin':
-      return <Navigate to='/admin' />
+    case 'hotel-chain':
+      return <Navigate to='/hotel-chain' />
     default:
       return <Navigate to='/' />
   }

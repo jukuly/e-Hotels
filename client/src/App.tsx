@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useAuthState } from './database/auth';
 import NotSignedIn from './guards/notSignedIn';
 import SignedIn from './guards/signedIn';
-import Admin from './pages/admin/admin';
+import HotelChain from './pages/hotelChain/hotelChain';
 import Client from './pages/client/client';
 import Employee from './pages/employee/employee';
 import SignIn from './pages/signIn/signIn';
@@ -19,7 +19,7 @@ export default function () {
           <Route path='/sign-up' element={<NotSignedIn user={user}><SignUp /></NotSignedIn>} />
           <Route path='/client' element={<SignedIn user={user} type='client'><Client /></SignedIn>} />
           <Route path='/employee' element={<SignedIn user={user} type='employee'><Employee /></SignedIn>} />
-          <Route path='/admin' element={<SignedIn user={user} type='admin'><Admin /></SignedIn>} />
+          <Route path='/hotel-chain' element={<SignedIn user={user} type='hotel-chain'><HotelChain /></SignedIn>} />
         </Routes>
       </BrowserRouter>
     </>
