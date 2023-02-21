@@ -6,9 +6,9 @@ export interface Client {
   id?: string,
   email?: string, 
   nas?: number, 
-  firstName?: string, 
-  lastName?: string, 
-  registrationDate?: Date,
+  first_name?: string, 
+  last_name?: string, 
+  registration_date?: Date,
   address?: Address, 
   password?: string 
 }
@@ -17,19 +17,19 @@ export interface Employee {
   id?: string,
   email?: string, 
   nas?: number, 
-  firstName?: string, 
-  lastName?: string, 
+  first_name?: string, 
+  last_name?: string, 
   address?: Address, 
-  hotelId?: number, 
+  hotel_id?: number, 
   roles?: string[], 
   password?: string
 }
 
 export interface Address {
   id?: string,
-  streetName?: string, 
-  streetNumber?: number, 
-  aptNumber?: number, 
+  street_name?: string, 
+  street_number?: number, 
+  apt_number?: number, 
   city?: string, 
   province?: string, 
   zip?: string
@@ -37,7 +37,7 @@ export interface Address {
 
 export interface Hotel {
   id?: string,
-  hotelChainId?: string,
+  hotel_chain_id?: string,
   rating?: number,
   email?: string, 
   phone?: number,
@@ -57,28 +57,28 @@ export interface Room {
   price?: number,
   commodities?: string[],
   capacity?: number,
-  seaVue?: boolean,
-  mountainVue?: boolean,
+  sea_vue?: boolean,
+  mountain_vue?: boolean,
   extendable?: boolean,
   issues?: string[],
-  hotelId?: string,
+  hotel_dd?: string,
   area?: number
 }
 
 export interface Reservation {
   id?: string,
-  roomId?: string,
-  clientId?: string,
-  startDate?: Date,
-  endDate?: Date,
+  room_id?: string,
+  client_id?: string,
+  start_date?: Date,
+  end_date?: Date,
 }
 
 export interface Location {
   id?: string,
-  roomId?: string,
-  clientId?: string,
-  startDate?: Date,
-  endDate?: Date,
+  room_id?: string,
+  client_id?: string,
+  start_date?: Date,
+  end_date?: Date,
 }
 
 export interface User {

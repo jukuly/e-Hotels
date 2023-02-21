@@ -29,12 +29,12 @@ export async function signUp(params: Client): Promise<any> {
 
   try {
     const clientCreated = await createClient({
-      email: params.email.toLowerCase(),
+      email: params.email!.toLowerCase(),
       nas: params.nas,
       firstName: params.firstName, 
       lastName: params.lastName, 
       address: params.address, 
-      password: await hashPassword(params.password)
+      password: await hashPassword(params.password!)
     });
     return createJWT(clientCreated.rows[0].id!, '2h');
   } catch (err: any) {

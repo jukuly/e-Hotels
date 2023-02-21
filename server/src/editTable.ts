@@ -1,6 +1,6 @@
 import { QueryResult } from 'pg';
 import pool from './database';
-import { Address, Client, Employee, HotelChain } from './types/interfaces';
+import { Address, Client, Employee, Hotel, HotelChain } from './types/interfaces';
 
 //Create client
 export async function createClient(client: Client): Promise<QueryResult<Client>> {
@@ -83,4 +83,20 @@ async function deleteAddress(id: number): Promise<QueryResult<Address>> {
     RETURNING *`,
     [id]
   );
+}
+
+//Create hotel
+export async function createHotel(hotel: Hotel): Promise<QueryResult<Hotel>> {
+
+  await pool.query('BEGIN');
+  const hotelCreated = await pool.query(
+    `INSERT INTO hotel (hotel_chain_id, email, phone) 
+    VALUES ($1, $2, $3) 
+    RETURNING *`,
+    [hotel.hotelChainId, hotel.email, hotel.phone]
+  );
+  await addAddress({ id: hotelCreated.rows[0].id, ...hotel.address });
+  await pool.query('COMMIT');
+
+  return hotelCreated;
 }

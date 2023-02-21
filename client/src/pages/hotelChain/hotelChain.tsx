@@ -3,13 +3,10 @@ import { isFilled, isEmailValid, isPhoneValid } from '../../helperFunctions/inpu
 import { saveProfileHotelChain } from '../../database/profileChange';
 import styles from './hotelChain.module.css';
 import { getHotelsFromHotelChain, getProfileHotelChain } from '../../database/getter';
-import { Hotel } from '../../types/interfaces';
 import Profile from '../../components/profile/profile';
+import HotelList from './hotelList/hotelList';
 
 export default function () {
-  const [hotels, setHotels] = useState<Hotel[]>([]);
-  const [addPressed, setAddPressed] = useState<boolean>(false);
-
   const [initialValue, setInitialValue] = useState<string[]>([]);
 
   useEffect(() => {
@@ -21,17 +18,8 @@ export default function () {
         console.error(err);
       }
     }
-    const getHotels = async () => {
-      try {
-        const hotels = await getHotelsFromHotelChain();
-        setHotels(hotels);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
+    
     getProfile();
-    getHotels();
   }, []);
 
   async function saveProfile(refs: RefObject<HTMLInputElement>[], setError: React.Dispatch<React.SetStateAction<string>>) {
@@ -102,35 +90,7 @@ export default function () {
         </div>
         <div className={styles.box}>
           <h1 className={styles.boxTitle}>Hotels</h1>
-          <div className={styles.hotels}>
-            {
-              hotels.map(hotel => 
-                <button className={`${styles.box} ${styles.hotelBox}`}>
-                  <span>{hotel.id}</span>
-                  <span>{hotel.email}</span>
-                  <span>{hotel.hotelChainId}</span>
-                  <span>{hotel.phone}</span>
-                  <span>{hotel.rating}</span>
-                  <span>{hotel.address?.streetNumber}</span>
-                  <span>{hotel.address?.aptNumber}</span>
-                  <span>{hotel.address?.city}</span>
-                  <span>{hotel.address?.province}</span>
-                  <span>{hotel.address?.streetName}</span>
-                  <span>{hotel.address?.zip}</span>
-                </button>
-              )
-            }
-            {
-              addPressed ?
-                <div className={`${styles.box} ${styles.hotelBox}`}>
-                  
-                </div>
-              :
-                <button className={`${styles.box} ${styles.hotelBox} ${styles.addHotel}`} onClick={() => setAddPressed(true)}>
-                  +
-                </button>
-            }  
-          </div>   
+          <HotelList />  
         </div>
       </main>
     </>

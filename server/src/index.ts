@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import pool from './database';
 import { getUserType, hashPassword, isAuthorized, signIn, signUp, verifyJWT } from './auth';
-import { updateHotelChain } from './editTable';
+import { createHotel, updateHotelChain } from './editTable';
 import { getAddress, getHotelChain, getHotelsFromHotelChain } from './selectTable';
 import { Hotel } from './types/interfaces';
 
@@ -48,7 +48,24 @@ app.post('/jwt', async (req, res) => {
 
 /////////////////////////////////////////////////////
 
-//PROFILE UPDATE/////////////////////////////////////
+//CREATE/////////////////////////////////////////////
+
+app.post('/hotel', async (req, res) => {
+  try {
+    const uid = await isAuthorized(req, 'hotel-chain');
+    if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
+    const hotel = await createHotel({ hotelChainId: uid, ...req.body });
+
+    res.status(200).json(hotel.rows[0]);   
+  } catch (err) {
+    console.error(err);
+    res.status(400).json(err);
+  }
+});
+
+/////////////////////////////////////////////////////
+
+//UPDATE/////////////////////////////////////////////
 
 app.post('/update-hotel-chain', async (req, res) => {
   try {
@@ -65,7 +82,7 @@ app.post('/update-hotel-chain', async (req, res) => {
 
 /////////////////////////////////////////////////////
 
-//GETTER/////////////////////////////////////////////
+//GET////////////////////////////////////////////////
 
 app.get('/hotel_chain', async (req, res) => {
   try {
@@ -465,10 +482,10 @@ app.get('/room', async (req, res) => {
 
 app.listen(5000, () => console.log('Listening on port 5000'));
 
-(async () => 
+/*(async () => 
   pool.query(
     `INSERT INTO hotel_chain (name, email, phone, password) VALUES ($1, $2, $3, $4)`,
     ['HChain', 'hchain@ehotel.com', '1234567890', await hashPassword('12345')]
   )
-)();
+)();*/
 

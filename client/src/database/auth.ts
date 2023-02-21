@@ -44,8 +44,8 @@ export async function signUpEmailPassword(newClient: Client): Promise<{ jwt: str
       body: JSON.stringify({ 
         email: newClient.email, 
         nas: newClient.nas, 
-        firstName: newClient.firstName, 
-        lastName: newClient.lastName, 
+        first_name: newClient.first_name, 
+        last_name: newClient.last_name, 
         address: newClient.address, 
         password: newClient.password 
       })
