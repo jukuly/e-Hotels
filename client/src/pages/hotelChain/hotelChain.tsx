@@ -2,7 +2,7 @@ import { RefObject, useEffect, useState } from 'react';
 import { isFilled, isEmailValid, isPhoneValid } from '../../helperFunctions/inputCheck';
 import { saveProfileHotelChain } from '../../database/profileChange';
 import styles from './hotelChain.module.css';
-import { getHotelsFromHotelChain, getProfileHotelChain } from '../../database/getter';
+import { getProfileHotelChain } from '../../database/getter';
 import Profile from '../../components/profile/profile';
 import HotelList from './hotelList/hotelList';
 
@@ -28,18 +28,18 @@ export default function () {
 
     //Every field should be filled
     if (!isFilled(nameRef) || !isFilled(emailRef) || !isFilled(phoneRef)) {
-    setError('Please fill every field');
-    return;
+      setError('Please fill every field');
+      return;
     }
 
     if (!isEmailValid(emailRef)) {
-    setError('Please enter a valid email address');
-    return;
+      setError('Please enter a valid email address');
+      return;
     }
 
     if (!isPhoneValid(phoneRef)) {
-    setError('Please make sure the phone number is in a numeric format');
-    return;
+      setError('Please make sure the phone number is in a numeric format');
+      return;
     }
 
     const params = {
