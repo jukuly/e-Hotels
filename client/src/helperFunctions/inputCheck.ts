@@ -65,3 +65,13 @@ export function isPhoneValid(phoneRef: RefObject<HTMLInputElement>): boolean {
     return true;
   }
 }
+
+export function isNASValid(nasRef: RefObject<HTMLInputElement>): boolean {
+  if (nasRef.current?.value.length !== 9 || !isNumber(nasRef)) {
+    nasRef.current?.classList.add('error');
+    return false;
+  } else {
+    nasRef.current?.classList.remove('error');
+    return true;
+  }
+}

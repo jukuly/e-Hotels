@@ -2,8 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import pool from './database';
 import { getUserType, hashPassword, isAuthorized, signIn, signUp, verifyJWT } from './auth';
-import { createHotel, updateHotelChain } from './editTable';
-import { getAddress, getHotelChain, getHotelsFromHotelChain } from './selectTable';
+import { createHotel, updateClient, updateHotelChain } from './editTable';
+import { getAddress, getClient, getHotelChain, getHotelsFromHotelChain } from './selectTable';
 import { Hotel } from './types/interfaces';
 
 const app = express();
@@ -80,6 +80,19 @@ app.post('/update-hotel-chain', async (req, res) => {
   }
 });
 
+app.post('/update-client',async (req, res) => {
+  try {
+    const uid = await isAuthorized(req, 'client');
+    if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
+    const client = await updateClient({ id: uid, ...req.body });
+
+    res.status(200).json(client.rows[0]);
+  } catch (err) {
+    console.log(err);
+    res.status(400).json(err);
+  }
+});
+
 /////////////////////////////////////////////////////
 
 //GET////////////////////////////////////////////////
@@ -110,6 +123,19 @@ app.get('/hotel', async (req, res) => {
     ) as Hotel[];
     
     res.status(200).json({ hotels: hotelsResponse });   
+  } catch (err) {
+    console.error(err);
+    res.status(400).json(err);
+  }
+});
+
+app.get('/client', async (req, res) => {
+  try {
+    const uid = await isAuthorized(req, 'client');
+    if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
+    const client = await getClient(uid as string);
+
+    res.status(200).json(client.rows[0]);   
   } catch (err) {
     console.error(err);
     res.status(400).json(err);

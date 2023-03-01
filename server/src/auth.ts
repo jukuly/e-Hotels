@@ -31,8 +31,8 @@ export async function signUp(params: Client): Promise<any> {
     const clientCreated = await createClient({
       email: params.email!.toLowerCase(),
       nas: params.nas,
-      firstName: params.firstName, 
-      lastName: params.lastName, 
+      first_name: params.first_name, 
+      last_name: params.last_name, 
       address: params.address, 
       password: await hashPassword(params.password!)
     });
