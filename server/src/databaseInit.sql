@@ -16,7 +16,8 @@ CREATE TABLE hotel_chain (
   email VARCHAR(40) NOT NULL UNIQUE,
   phone BIGINT NOT NULL UNIQUE,
   password VARCHAR NOT NULL,
-  CHECK (email ~ '^[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*([.][a-zA-Z]{2,3})+$')
+  CHECK (email ~ '^[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*([.][a-zA-Z]{2,3})+$'),
+  CHECK (phone >= 0 AND phone <= 9999999999)
 );
 
 CREATE TABLE hotel (
@@ -26,7 +27,9 @@ CREATE TABLE hotel (
   email VARCHAR(40) NOT NULL,
   phone BIGINT NOT NULL,
   FOREIGN KEY (hotel_chain_id) REFERENCES hotel_chain ON UPDATE CASCADE,
-  CHECK (email ~ '^[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*([.][a-zA-Z]{2,3})+$')
+  CHECK (email ~ '^[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*([.][a-zA-Z]{2,3})+$'),
+  CHECK (rating >= 0 AND rating <= 5),
+  CHECK (phone >= 0 AND phone <= 9999999999)
 );
 
 CREATE TABLE employee (
@@ -39,7 +42,8 @@ CREATE TABLE employee (
   roles VARCHAR(20)[],
   password VARCHAR NOT NULL,
   FOREIGN KEY (hotel_id) REFERENCES hotel ON UPDATE CASCADE,
-  CHECK (email ~ '^[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*([.][a-zA-Z]{2,3})+$')
+  CHECK (email ~ '^[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*([.][a-zA-Z]{2,3})+$'),
+  CHECK (nas >= 0 AND nas <= 999999999)
 );
 
 CREATE TABLE client (
@@ -50,7 +54,8 @@ CREATE TABLE client (
   last_name VARCHAR(20) NOT NULL,
   registration_date TIMESTAMPTZ DEFAULT NOW(),
   password VARCHAR NOT NULL,
-  CHECK (email ~ '^[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*([.][a-zA-Z]{2,3})+$')
+  CHECK (email ~ '^[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*([.][a-zA-Z]{2,3})+$'),
+  CHECK (nas >= 0 AND nas <= 999999999)
 );
 
 CREATE TABLE room (
@@ -64,7 +69,10 @@ CREATE TABLE room (
   issues TEXT[],
   hotel_id UUID NOT NULL,
   area INT NOT NULL,
-  FOREIGN KEY (hotel_id) REFERENCES hotel ON UPDATE CASCADE
+  FOREIGN KEY (hotel_id) REFERENCES hotel ON UPDATE CASCADE,
+  CHECK (price >= 0),
+  CHECK (capacity >= 0),
+  CHECK (area >= 0)
 );
 
 CREATE TABLE reservation (
