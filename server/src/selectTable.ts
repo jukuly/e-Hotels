@@ -1,4 +1,4 @@
-import { QueryResult } from 'pg';
+import { Client, QueryResult } from 'pg';
 import pool from './database';
 import { Address, Hotel, HotelChain } from './types/interfaces';
 
@@ -24,6 +24,15 @@ export async function getHotelsFromHotelChain(id: string): Promise<QueryResult<H
 export async function getAddress(id: string): Promise<QueryResult<Address>> {
   return await pool.query<Address>(
     `SELECT * FROM address
+    WHERE id = $1`,
+    [id]
+  );
+}
+
+//Select a client
+export async function getClient(id: String): Promise<QueryResult<Client>> {
+  return await pool.query<Client>(
+    `SELECT * FROM client
     WHERE id = $1`,
     [id]
   );

@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signUpEmailPassword } from '../../database/auth';
-import { isFilled, isEmailValid, isPasswordValid, isPasswordConfirmValid, isNumber } from '../../helperFunctions/inputCheck';
+import { isFilled, isEmailValid, isPasswordValid, isPasswordConfirmValid, isNumber, isNASValid } from '../../helperFunctions/inputCheck';
 import styles from './signUp.module.css'
 
 export default function () {
@@ -40,6 +40,10 @@ export default function () {
     if (!isNumber(streetNumberRef)) {
       setError('Please make sure the street number is in a numeric format');
       return;
+    }
+
+    if (!isNASValid(nasRef)) {
+      setError('Please make sure the NAS is a number of length 9');
     }
 
     if (!isNumber(aptNumberRef) && isFilled(aptNumberRef)) {
