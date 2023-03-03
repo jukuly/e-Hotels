@@ -105,7 +105,7 @@ export async function createHotel(hotel: Hotel): Promise<QueryResult<Hotel>> {
 export async function updateClient(client: Client): Promise<QueryResult<Client>> {
   try {
     return await pool.query<Client>(
-      `UPDATE hotel_chain
+      `UPDATE client
         SET
           ${client.first_name ? 'first_name = $2,' : ''}
           ${client.last_name ? 'last_name = $3,' : ''}
