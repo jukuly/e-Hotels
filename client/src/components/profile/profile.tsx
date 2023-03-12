@@ -1,4 +1,6 @@
 import { RefObject, useEffect, useRef, useState } from 'react';
+import { signOut } from '../../database/auth';
+import { deleteCurrentUser } from '../../database/profileChange';
 import styles from './profile.module.css'
 
 export default function ({ title, onSave, inputs }: {
@@ -20,6 +22,11 @@ export default function ({ title, onSave, inputs }: {
       if (inputs[index].initialValue) ref.current?.setAttribute('value', inputs[index].initialValue!);
     });
   }, [inputs])
+
+  async function deleteUser() {
+    deleteCurrentUser();
+    signOut();
+  }
   
   return (
     <>
@@ -44,6 +51,7 @@ export default function ({ title, onSave, inputs }: {
           <button className={styles.saveButton} type='submit'>Save</button>
         </div>
       </form>
+      <div className={styles.aWrapper}><span onClick={() => deleteUser()}>Delete this user</span></div>
     </>
   );
 }

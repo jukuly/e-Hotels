@@ -1,8 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import pool from './database';
-import { getUserType, hashPassword, isAuthorized, signIn, signUp, verifyJWT } from './auth';
-import { createHotel, updateClient, updateHotelChain } from './editTable';
+import { getUserType, isAuthorized, signIn, signUp, verifyJWT } from './auth';
+import { createHotel, deleteUser, updateClient, updateHotelChain } from './editTable';
 import { getAddress, getClient, getHotelChain, getHotelsFromHotelChain } from './selectTable';
 import { Hotel } from './types/interfaces';
 
@@ -87,6 +87,23 @@ app.post('/update-client',async (req, res) => {
     const client = await updateClient({ id: uid, ...req.body });
 
     res.status(200).json(client.rows[0]);
+  } catch (err) {
+    console.log(err);
+    res.status(400).json(err);
+  }
+});
+
+/////////////////////////////////////////////////////
+
+//DELETE/////////////////////////////////////////////
+
+app.delete('/user', async (req, res) => {
+  try {
+    const uid = verifyJWT(req.header('Authorization')?.split(' ')[1]);
+    if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
+    const user = await deleteUser(uid, await getUserType(uid));
+    
+    res.status(200).json(user.rows[0]);
   } catch (err) {
     console.log(err);
     res.status(400).json(err);

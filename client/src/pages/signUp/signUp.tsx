@@ -1,5 +1,4 @@
 import { useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { signUpEmailPassword } from '../../database/auth';
 import { isFilled, isEmailValid, isPasswordValid, isPasswordConfirmValid, isNumber, isNASValid } from '../../helperFunctions/inputCheck';
 import styles from './signUp.module.css'
@@ -19,8 +18,6 @@ export default function () {
   const zipCodeRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const passwordConfirRef = useRef<HTMLInputElement>(null);
-
-  const navigate = useNavigate();
 
   async function signUp() {
 
@@ -80,7 +77,7 @@ export default function () {
     try {
       await signUpEmailPassword(params);
       setError('');
-      navigate('/client');
+      window.location.reload();
     } catch (err: any) {
       if (err.code === 'user-already-exists') {
         setError('This email and/or NAS is already taken');

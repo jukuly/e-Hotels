@@ -106,19 +106,34 @@ export async function updateClient(client: Client): Promise<QueryResult<Client>>
   try {
     return await pool.query<Client>(
       `UPDATE client
-        SET
-          ${client.first_name ? 'first_name = $2,' : ''}
-          ${client.last_name ? 'last_name = $3,' : ''}
-          ${client.email ? 'email = $4,' : ''}
-          ${client.nas ? 'nas = $5' : ''}
-        WHERE id = $1
-        RETURNING *`,
+      SET
+        ${client.first_name ? 'first_name = $2,' : ''}
+        ${client.last_name ? 'last_name = $3,' : ''}
+        ${client.email ? 'email = $4,' : ''}
+        ${client.nas ? 'nas = $5' : ''}
+      WHERE id = $1
+      RETURNING *`,
       [client.id, client.first_name, client.last_name, client.email, client.nas]
     );
   } catch (err: any) {
     if (err.code === '23505') {
       throw { code: 'user-already-exists', message: 'This NAS and/or email is already taken', error: err };
     }
+    throw { code: 'unknown', message: 'Unexpected error', error: err };
+  }
+}
+
+//Delete client
+export async function deleteUser(uid: string, type: 'client' | 'employee' | 'hotel-chain' | undefined): Promise<QueryResult<Client | Employee | HotelChain>> {
+  if (!type) throw { code: 'unknown', message: 'Unexpected error' };
+  try {
+    return await pool.query<Client>(
+      `DELETE FROM ${type}
+      WHERE id = $1
+      RETURNING *`,
+      [uid]
+    );
+  } catch (err: any) {
     throw { code: 'unknown', message: 'Unexpected error', error: err };
   }
 }

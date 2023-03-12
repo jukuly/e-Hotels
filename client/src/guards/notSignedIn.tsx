@@ -1,20 +1,19 @@
-import { Navigate } from 'react-router-dom';
-import { User } from '../types/interfaces';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getUser } from '../database/auth';
 
-export default function({ user, children }: { user: User | null, children: any }) {
-  if (!user) {
-    return children;
-  }
+export default function({ children }: { children: any }) {
+  const navigate = useNavigate();
 
-  switch (user.type) {
-    case 'client':
-      return <Navigate to='/client' />
-    case 'employee':
-      return <Navigate to='/employee' />
-    case 'hotel-chain':
-      return <Navigate to='/hotel-chain' />
-    default:
-      return <Navigate to='/' />
-  }
+  useEffect(() => {
+    const navigateToUser = async () => {
+      const user = await getUser();
+      if (user) navigate(`/${user.type}`);
+    }
+    
+    navigateToUser();
+  }, []);
+
+  return children;
 }
 

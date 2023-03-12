@@ -59,3 +59,27 @@ export async function saveProfileClient(client: Client) {
     throw err;
   }
 }
+
+export async function deleteCurrentUser() {
+  try {
+    const response = await fetch('http://localhost:5000/user', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+      }
+    });
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      const error: ErrorWithCode = new Error(responseData.message)
+      error.code = responseData.code;
+      throw error;
+    } 
+    
+    return responseData;
+  } catch (err) {
+    throw err;
+  }
+}
