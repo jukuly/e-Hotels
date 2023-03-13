@@ -4,6 +4,7 @@ import { getProfileClient } from '../../database/getter';
 import { saveProfileClient } from '../../database/profileChange';
 import { isEmailValid, isFilled, isNASValid } from '../../helperFunctions/inputCheck';
 import styles from './client.module.css'
+import SearchRoom from './searchRoom/searchRoom';
 
 export default function () {
   const [initialValue, setInitialValue] = useState<string[]>([]);
@@ -97,6 +98,7 @@ export default function () {
         </div>
         <div className={styles.box}>
           <h1 className={styles.boxTitle}>Find a room</h1>
+          <SearchRoom />
         </div>
       </main>
     </>

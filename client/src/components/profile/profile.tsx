@@ -34,7 +34,7 @@ export default function ({ title, onSave, inputs }: {
             return (
               <div className={styles.inputGroup} key={index}>
                 <span>{ input.name }: </span>
-                <input className={`${styles.input}`} type={input.type} placeholder={input.name} size={1} ref={inputRefs[index]} onChange={() => input.onChange(inputRefs[index])} maxLength={input.maxLength} />
+                <input className={styles.input} type={input.type} placeholder={input.name} size={1} ref={inputRefs[index]} onChange={() => input.onChange(inputRefs[index])} maxLength={input.maxLength} />
               </div>
             );
           })

@@ -80,11 +80,11 @@ export async function getUserType(uid: string): Promise<'client' | 'employee' | 
   return type;
 }
 
-export async function isAuthorized(request: Request, userType: 'client' | 'employee' | 'hotel-chain'): Promise<string | boolean> {
+export async function isAuthorized(request: Request, userType: 'client' | 'employee' | 'hotel-chain' | 'any'): Promise<string | boolean> {
   try { 
     const uid = verifyJWT(request.header('Authorization')?.split(' ')[1]); 
     const type = await getUserType(uid);
-    return (type === userType) && uid;
+    return (type === userType || userType === 'any') && uid;
   } catch (err) {
     console.error(err);
     return false;

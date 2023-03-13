@@ -2,6 +2,18 @@ export interface ErrorWithCode extends Error {
   code?: string;
 }
 
+export interface SearchFilters {
+  startDate?: Date, 
+  endDate?: Date, 
+  capacity?: number, 
+  area?: number, 
+  chainName?: string, 
+  hotelRating?: number, 
+  numberOfRoomInHotel?: number, 
+  priceMin?: number, 
+  priceMax?: number
+}
+
 export interface Client {
   id?: string,
   email?: string, 

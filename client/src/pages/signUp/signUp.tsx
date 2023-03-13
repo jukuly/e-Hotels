@@ -101,11 +101,11 @@ export default function () {
           <input className={styles.two} type='text' placeholder='First Name *' size={1} ref={firstNameRef} onChange={() => isFilled(firstNameRef)} maxLength={20} />
           <input className={styles.two} type='text' placeholder='Last Name *' size={1} ref={lastNameRef} onChange={() => isFilled(lastNameRef)} maxLength={20} />
           <input type='text' placeholder='Email *' size={1} ref={emailRef} onChange={() => isEmailValid(emailRef)} maxLength={40} />
-          <input type='text' placeholder='NAS *' size={1} ref={nasRef} onChange={() => isNumber(nasRef)} maxLength={9} />
+          <input type='text' placeholder='NAS *' size={1} ref={nasRef} onChange={() => isNumber(nasRef)} maxLength={9} inputMode='numeric' />
 
-          <input className={styles.one} type='text' placeholder='Number *' size={1} ref={streetNumberRef} onChange={() => isNumber(streetNumberRef)} />
+          <input className={styles.one} type='text' placeholder='Number *' size={1} ref={streetNumberRef} onChange={() => isNumber(streetNumberRef)} inputMode='numeric' />
           <input className={styles.two} type='text' placeholder='Street *' size={1} ref={streetNameRef} onChange={() => isFilled(streetNameRef)} maxLength={40} />
-          <input className={styles.one} type='text' placeholder='Apt' size={1} ref={aptNumberRef} onChange={() => isNumber(aptNumberRef)} />
+          <input className={styles.one} type='text' placeholder='Apt' size={1} ref={aptNumberRef} onChange={() => isNumber(aptNumberRef)} inputMode='numeric' />
           <input className={styles.two} type='text' placeholder='City *' size={1} ref={cityRef} onChange={() => isFilled(cityRef)} maxLength={20} />
           <input className={styles.two} type='text' placeholder='Province *' size={1} ref={provinceRef} onChange={() => isFilled(provinceRef)} maxLength={20} />
           <input type='text' placeholder='Zip Code *' size={1} ref={zipCodeRef} onChange={() => isFilled(zipCodeRef)} maxLength={7} />

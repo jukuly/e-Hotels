@@ -41,7 +41,7 @@ code {
   'opsz' 48
 }
 
-input {
+input, select {
   color: inherit;
   padding: 0.5rem 0.75rem;
   border-radius: 0;
@@ -51,7 +51,7 @@ input {
   transition: border-color 300ms;
 }
 
-input:focus {
+input:focus, select:focus {
   outline: none;
   border-bottom-color: #540099;
 }

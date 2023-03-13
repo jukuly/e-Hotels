@@ -1,4 +1,4 @@
-import { HotelChain, ErrorWithCode, Hotel, Client } from '../types/interfaces';
+import { HotelChain, ErrorWithCode, Hotel, Client, Room, SearchFilters } from '../types/interfaces';
 
 export async function getProfileHotelChain(): Promise<HotelChain> {
   try {
@@ -53,6 +53,30 @@ export async function getProfileClient(): Promise<Client> {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('jwt')}`
       }
+    });
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      const error: ErrorWithCode = new Error(responseData.message)
+      error.code = responseData.code;
+      throw error;
+    } 
+    
+    return responseData;
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function getRooms(filters: SearchFilters): Promise<Room[]> {
+  try {
+    const response = await fetch('http://localhost:5000/room', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+      },
+      body: JSON.stringify(filters)
     });
 
     const responseData = await response.json();
