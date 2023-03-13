@@ -68,6 +68,7 @@ export async function signUpEmailPassword(newClient: Client): Promise<{ jwt: str
 
 export function signOut(): void {
   localStorage.removeItem('jwt');
+  window.location.reload();
 }
 
 export function useAuthState(): User | null {

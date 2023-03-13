@@ -1,10 +1,19 @@
-import { Navigate } from 'react-router-dom';
-import { User } from '../types/interfaces';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getUser } from '../database/auth';
 
-export default function({ user, type, children }: { user: User | null, type: 'client' | 'employee' | 'hotel-chain', children: any }) {
-  //if (user?.type === type) {
-    return children;
-  //}
-  //return <Navigate to='/' />
+export default function({ type, children }: { type: 'client' | 'employee' | 'hotel-chain', children: any }) {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const navigateToUser = async () => {
+      const user = await getUser();
+      if (!user || user.type !== type) navigate('/');
+    }
+    
+    navigateToUser();
+  }, []);
+
+  return children;
 }
 

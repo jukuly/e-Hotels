@@ -1,5 +1,6 @@
 import { RefObject, useEffect, useState } from 'react';
 import Profile from '../../components/profile/profile';
+import { signOut } from '../../database/auth';
 import { getProfileClient } from '../../database/getter';
 import { saveProfileClient } from '../../database/profileChange';
 import { isEmailValid, isFilled, isNASValid } from '../../helperFunctions/inputCheck';

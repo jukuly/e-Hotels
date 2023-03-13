@@ -15,11 +15,11 @@ export default function () {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path='/' element={<NotSignedIn user={user}><SignIn /></NotSignedIn>} />
-          <Route path='/sign-up' element={<NotSignedIn user={user}><SignUp /></NotSignedIn>} />
-          <Route path='/client' element={<SignedIn user={user} type='client'><Client /></SignedIn>} />
-          <Route path='/employee' element={<SignedIn user={user} type='employee'><Employee /></SignedIn>} />
-          <Route path='/hotel-chain' element={<SignedIn user={user} type='hotel-chain'><HotelChain /></SignedIn>} />
+          <Route path='/' element={<NotSignedIn><SignIn /></NotSignedIn>} />
+          <Route path='/sign-up' element={<NotSignedIn><SignUp /></NotSignedIn>} />
+          <Route path='/client' element={<SignedIn type='client'><Client /></SignedIn>} />
+          <Route path='/employee' element={<SignedIn type='employee'><Employee /></SignedIn>} />
+          <Route path='/hotel-chain' element={<SignedIn type='hotel-chain'><HotelChain /></SignedIn>} />
         </Routes>
       </BrowserRouter>
     </>

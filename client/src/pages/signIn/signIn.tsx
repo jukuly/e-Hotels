@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react';
 import styles from './signIn.module.css'
-import { getUser, signInEmailPassword } from '../../database/auth';
-import { useNavigate } from 'react-router-dom';
+import { signInEmailPassword } from '../../database/auth';
 
 export default function () {
   const [error, setError] = useState<string>('');
@@ -9,15 +8,13 @@ export default function () {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
-  const navigate = useNavigate();
-
   async function signIn() {
     try {
       await signInEmailPassword(emailRef.current?.value.toLowerCase().trim(), passwordRef.current?.value);
       emailRef.current?.classList.remove('error');
       passwordRef.current?.classList.remove('error');
       setError('');
-      navigate(`/${(await getUser())?.type}`);
+      window.location.reload();
     } catch (err: any) {
       if (err.code === 'missing-credentials' || err.code === 'invalid-credentials') {
         setError('Username or password incorrect');

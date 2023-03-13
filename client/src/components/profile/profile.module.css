@@ -54,3 +54,26 @@
   border-width: 3px;
   padding: calc(0.5rem - 1px) calc(0.75rem - 1px);
 }
+
+.aWrapper {
+  display: grid;
+  place-items: center;
+}
+
+.aWrapper span {
+  color: inherit;
+  text-align: center;
+  margin-top: 1.5rem;
+
+  background-image: linear-gradient(#540099, #540099);
+  background-size: 0% 0.1em;
+  background-position-y: 100%;
+  background-position-x: 0%;
+  background-repeat: no-repeat;
+  transition: background-size 150ms ease-in-out;
+  cursor: pointer;
+}
+
+.aWrapper span:hover {
+  background-size: 100% 0.1em;
+}
