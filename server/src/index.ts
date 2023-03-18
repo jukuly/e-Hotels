@@ -2,9 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import pool from './database';
 import { getUserType, isAuthorized, signIn, signUp, verifyJWT } from './auth';
-import { createHotel, deleteUser, updateClient, updateHotelChain } from './editTable';
+import { createHotel, deleteHotel, deleteUser, updateClient, updateHotel, updateHotelChain } from './editTable';
 import { getAddress, getClient, getHotelChain, getHotelsFromHotelChain, getRooms } from './selectTable';
-import { Hotel, Room } from './types/interfaces';
+import { Hotel, HotelChain, Client } from './types/interfaces';
 
 const app = express();
 
@@ -52,7 +52,7 @@ app.post('/jwt', async (req, res) => {
 
 app.post('/hotel', async (req, res) => {
   try {
-    const uid = await isAuthorized(req, 'hotel-chain');
+    const uid = await isAuthorized(req, ['hotel-chain']);
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
     const hotel = await createHotel({ hotel_chain_id: uid, ...req.body });
 
@@ -69,7 +69,7 @@ app.post('/hotel', async (req, res) => {
 
 app.post('/update-hotel-chain', async (req, res) => {
   try {
-    const uid = await isAuthorized(req, 'hotel-chain');
+    const uid = await isAuthorized(req, ['hotel-chain']);
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
     const hotelChain = await updateHotelChain({ id: uid, ...req.body });
 
@@ -80,13 +80,26 @@ app.post('/update-hotel-chain', async (req, res) => {
   }
 });
 
-app.post('/update-client',async (req, res) => {
+app.post('/update-client', async (req, res) => {
   try {
-    const uid = await isAuthorized(req, 'client');
+    const uid = await isAuthorized(req, ['client']);
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
     const client = await updateClient({ id: uid, ...req.body });
 
     res.status(200).json(client.rows[0]);
+  } catch (err) {
+    console.log(err);
+    res.status(400).json(err);
+  }
+});
+
+app.post('/update-hotel', async (req, res) => {
+  try {
+    const uid = await isAuthorized(req, ['hotel-chain', 'employee']);
+    if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
+    const hotel = await updateHotel(req.body);
+
+    res.status(200).json(hotel.rows[0]);
   } catch (err) {
     console.log(err);
     res.status(400).json(err);
@@ -99,11 +112,24 @@ app.post('/update-client',async (req, res) => {
 
 app.delete('/user', async (req, res) => {
   try {
-    const uid = await isAuthorized(req, 'any');
+    const uid = await isAuthorized(req, ['client', 'employee', 'hotel-chain']);
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
     const user = await deleteUser(uid as string, await getUserType(uid as string));
     
     res.status(200).json(user.rows[0]);
+  } catch (err) {
+    console.log(err);
+    res.status(400).json(err);
+  }
+});
+
+app.delete('/hotel/:hotelId', async (req, res) => {
+  try {
+    const uid = await isAuthorized(req, ['hotel-chain', 'employee']);
+    if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
+    const hotel = await deleteHotel(req.params.hotelId);
+    
+    res.status(200).json(hotel.rows[0]);
   } catch (err) {
     console.log(err);
     res.status(400).json(err);
@@ -116,11 +142,17 @@ app.delete('/user', async (req, res) => {
 
 app.get('/hotel_chain', async (req, res) => {
   try {
-    const uid = await isAuthorized(req, 'hotel-chain');
+    const uid = await isAuthorized(req, ['hotel-chain']);
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
     const hotelChain = await getHotelChain(uid as string);
 
-    res.status(200).json(hotelChain.rows[0]);   
+    const hotelChainResponse = await Promise.all(
+      hotelChain.rows.map(async (hotelChain) => {
+        return { ...hotelChain, address: (await getAddress(hotelChain.id!)).rows[0] }
+      })
+    ) as HotelChain[];
+
+    res.status(200).json(hotelChainResponse[0]);   
   } catch (err) {
     console.error(err);
     res.status(400).json(err);
@@ -129,7 +161,7 @@ app.get('/hotel_chain', async (req, res) => {
 
 app.get('/hotel', async (req, res) => {
   try {
-    const uid = await isAuthorized(req, 'hotel-chain');
+    const uid = await isAuthorized(req, ['hotel-chain']);
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
     const hotels = await getHotelsFromHotelChain(uid as string);
 
@@ -148,11 +180,17 @@ app.get('/hotel', async (req, res) => {
 
 app.get('/client', async (req, res) => {
   try {
-    const uid = await isAuthorized(req, 'client');
+    const uid = await isAuthorized(req, ['client']);
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
     const client = await getClient(uid as string);
 
-    res.status(200).json(client.rows[0]);   
+    const clientResponse = await Promise.all(
+      client.rows.map(async (c) => {
+        return { ...c, address: (await getAddress(c.id!)).rows[0] }
+      })
+    ) as Client[];
+
+    res.status(200).json(clientResponse[0]);   
   } catch (err) {
     console.error(err);
     res.status(400).json(err);
@@ -162,7 +200,7 @@ app.get('/client', async (req, res) => {
 //Get room search results with filters
 app.get('/room-search', async (req, res) => {
   try {
-    const uid = await isAuthorized(req, 'any');
+    const uid = await isAuthorized(req, ['client', 'employee']);
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
 
     const filters = JSON.parse(req.query.filters as string);
@@ -175,13 +213,7 @@ app.get('/room-search', async (req, res) => {
       }
     );
 
-    const roomsResponse = await Promise.all(
-      rooms.rows.map(async (room) => {
-        return { ...room }
-      })
-    ) as Room[];
-
-    res.status(200).json({ rooms: roomsResponse });
+    res.status(200).json({ rooms: rooms.rows });
   } catch (err) {
     console.error(err);
     res.status(400).json(err);
@@ -192,108 +224,6 @@ app.get('/room-search', async (req, res) => {
 
 
 
-//Update client
-app.put('/client/:id', async (req, res) => {
-  try {
-    const id = parseInt(req.params.id);
-    const { nas, firstName, lastName, address, password } = req.body;
-
-    //Transaction so the address is not updated if updating the client fails
-    await pool.query('BEGIN');
-    //if (address) await updateAddress(id, { ...address });
-    const clientUpdate = await pool.query(
-      `UPDATE client
-      SET
-        ${nas ? 'nas = $1,' : ''}
-        ${firstName ? 'first_name = $2,' : ''}
-        ${lastName ? 'last_name = $3,' : ''}
-        ${password ? 'password = $4' : ''}
-      WHERE id = $5
-      RETURNING *`,
-      [nas, firstName, lastName, password, id]
-    );
-    await pool.query('COMMIT');
-
-    res.json(clientUpdate);
-  } catch (err: any) {
-    console.error(err);
-    await pool.query('ROLLBACK');
-  }
-});
-
-//Update employee
-app.put('/employee/:id', async (req, res) => {
-  try {
-    const id = parseInt(req.params.id);
-    const { nas, firstName, lastName, address, roles, password } = req.body;
-
-    //Transaction so the address is not updated if updating the employee fails
-    await pool.query('BEGIN');
-    //if (address) await updateAddress(id, { ...address });
-    const employeeUpdate = await pool.query(
-      `UPDATE employee
-      SET
-        ${nas ? 'nas = $1,' : ''}
-        ${firstName ? 'first_name = $2,' : ''}
-        ${lastName ? 'last_name = $3,' : ''}
-        ${roles ? 'roles = $4,' : ''}
-        ${password ? 'password = $5' : ''}
-      WHERE id = $6
-      RETURNING *`,
-      [nas, firstName, lastName, roles, password, id]
-    );
-    await pool.query('COMMIT');
-
-    res.json(employeeUpdate);
-  } catch (err: any) {
-    console.error(err);
-    await pool.query('ROLLBACK');
-  }
-});
-
-//Delete client
-app.delete('/client/:id', async (req, res) => {
-  try {
-    const id = parseInt(req.params.id);
-
-    //Transaction so the address is not deleted if deleting the client fails
-    await pool.query('BEGIN');
-    const clientDelete = await pool.query(
-      `DELETE FROM client 
-      WHERE id = $1`,
-      [id]
-    );
-    //await deleteAddress(id);
-    await pool.query('COMMIT');
-
-    res.json(clientDelete);
-  } catch (err: any) {
-    console.error(err);
-    await pool.query('ROLLBACK');
-  }
-});
-
-//Delete employee
-app.delete('/employee/:id', async (req, res) => {
-  try {
-    const id = parseInt(req.params.id);
-
-    //Transaction so the address is not deleted if deleting the employee fails
-    await pool.query('BEGIN');
-    const employeeDelete = await pool.query(
-      `DELETE FROM employee 
-      WHERE id = $1`,
-      [id]
-    );
-    //await deleteAddress(id);
-    await pool.query('COMMIT');
-
-    res.json(employeeDelete);
-  } catch (err: any) {
-    console.error(err);
-    await pool.query('ROLLBACK');
-  }
-});
 
 //Create reservation
 app.post('/reservation', async (req, res) => {
@@ -421,82 +351,6 @@ app.delete('/room/:id', async (req, res) => {
     console.error(err.message);
   }
 });
-
-//Add hotel
-app.post('/hotel', async (req, res) => {
-  try {
-    const { hotelChainId, rating, address, email, phone } = req.body;
-
-    //Transaction so the address is not inserted if inserting the hotel fails
-    await pool.query('BEGIN');
-    const hotelPost = await pool.query(
-      `INSERT INTO hotel (hotel_chain_id, rating, email, phone) 
-      VALUES ($1, $2, $3, $4) 
-      RETURNING *`,
-      [hotelChainId, rating, email, phone]
-    );
-    //await addAddress(hotelPost.rows[0].id, { ...address });
-    await pool.query('COMMIT');
-
-    res.json(hotelPost);
-  } catch (err: any) {
-    console.error(err.message);
-    await pool.query('ROLLBACK');
-  }
-});
-
-//Update hotel
-app.put('/hotel/:id', async (req, res) => {
-  try {
-    const id = parseInt(req.params.id);
-    const { rating, address, email, phone } = req.body;
-
-    //Transaction so the address is not inserted if updating the hotel fails
-    await pool.query('BEGIN');
-    if (address) {
-      //await updateAddress(id, { ...address });
-    }
-    const hotelUpdate = await pool.query(
-      `UPDATE hotel
-      SET
-        ${rating ? 'rating = $1,' : ''}
-        ${email ? 'email = $2,' : ''}
-        ${phone ? 'phone = $3' : ''} 
-      WHERE id = $4
-      RETURNING *`,
-      [rating, email, phone, id]
-    );
-    await pool.query('COMMIT');
-
-    res.json(hotelUpdate);
-  } catch (err: any) {
-    console.error(err.message);
-    await pool.query('ROLLBACK');
-  }
-});
-
-//Remove hotel
-app.delete('/hotel/:id', async (req, res) => {
-  try {
-    const id = parseInt(req.params.id);
-    
-    //Transaction so the address is not inserted if deleting the hotel fails
-    await pool.query('BEGIN');
-    const hotelDelete = await pool.query(
-      `DELETE FROM hotel 
-      WHERE id = $1`,
-      [id]
-    );
-    //await deleteAddress(id);
-    await pool.query('COMMIT');
-
-    res.json(hotelDelete);
-  } catch (err: any) {
-    console.error(err.message);
-    await pool.query('ROLLBACK');
-  }
-});
-
 
 app.listen(5000, () => console.log('Listening on port 5000'));
 

@@ -34,27 +34,6 @@ export async function createEmployee(employee: Employee): Promise<QueryResult<Em
   return employeeCreated;
 }
 
-//Update hotel chain
-export async function updateHotelChain(hotelChain: HotelChain): Promise<QueryResult<HotelChain>> {
-  try {
-    return await pool.query<HotelChain>(
-      `UPDATE hotel_chain
-      SET
-        ${hotelChain.name ? 'name = $2,' : ''}
-        ${hotelChain.email ? 'email = $3,' : ''}
-        ${hotelChain.phone ? 'phone = $4' : ''}
-      WHERE id = $1
-      RETURNING *`,
-      [hotelChain.id, hotelChain.name, hotelChain.email, hotelChain.phone]
-    );
-  } catch (err: any) {
-    if (err.code === '23505') {
-      throw { code: 'hotel-chain-already-exists', message: 'This name and/or email and/or phone number is already taken', error: err };
-    }
-    throw { code: 'unknown', message: 'Unexpected error', error: err };
-  }
-}
-
 //Create address
 async function addAddress(address: Address): Promise<QueryResult<Address>> {
   return await pool.query(
@@ -76,7 +55,7 @@ async function updateAddress(address: Address): Promise<QueryResult<Address>> {
 }
 
 //Delete address
-async function deleteAddress(id: number): Promise<QueryResult<Address>> {
+async function deleteAddress(id: string): Promise<QueryResult<Address>> {
   return await pool.query(
     `DELETE FROM address
     WHERE id = $1
@@ -85,26 +64,58 @@ async function deleteAddress(id: number): Promise<QueryResult<Address>> {
   );
 }
 
+//Update hotel chain
+export async function updateHotelChain(hotelChain: HotelChain): Promise<QueryResult<HotelChain>> {
+  try {
+    await pool.query('BEGIN');
+    const hotelChainUpdated = await pool.query<HotelChain>(
+      `UPDATE hotel_chain
+      SET
+        ${hotelChain.name ? 'name = $2,' : ''}
+        ${hotelChain.email ? 'email = $3,' : ''}
+        ${hotelChain.phone ? 'phone = $4' : ''}
+      WHERE id = $1
+      RETURNING *`,
+      [hotelChain.id, hotelChain.name, hotelChain.email, hotelChain.phone]
+    );
+    await updateAddress({ id: hotelChain.id, ...hotelChain.address });
+    await pool.query('COMMIT');
+
+    return hotelChainUpdated;
+  } catch (err: any) {
+    await pool.query('ROLLBACK');
+    if (err.code === '23505') {
+      throw { code: 'hotel-chain-already-exists', message: 'This name and/or email and/or phone number is already taken', error: err };
+    }
+    throw { code: 'unknown', message: 'Unexpected error', error: err };
+  }
+}
+
 //Create hotel
 export async function createHotel(hotel: Hotel): Promise<QueryResult<Hotel>> {
-
-  await pool.query('BEGIN');
-  const hotelCreated = await pool.query(
-    `INSERT INTO hotel (hotel_chain_id, email, phone) 
-    VALUES ($1, $2, $3) 
-    RETURNING *`,
-    [hotel.hotel_chain_id, hotel.email, hotel.phone]
-  );
-  await addAddress({ id: hotelCreated.rows[0].id, ...hotel.address });
-  await pool.query('COMMIT');
-
-  return hotelCreated;
+  try {
+    await pool.query('BEGIN');
+    const hotelCreated = await pool.query(
+      `INSERT INTO hotel (hotel_chain_id, email, phone) 
+      VALUES ($1, $2, $3) 
+      RETURNING *`,
+      [hotel.hotel_chain_id, hotel.email, hotel.phone]
+    );
+    await addAddress({ id: hotelCreated.rows[0].id, ...hotel.address });
+    await pool.query('COMMIT');
+  
+    return hotelCreated;
+  } catch (err: any) {
+    await pool.query('ROLLBACK');
+    throw { code: 'unknown', message: 'Unexpected error', error: err };
+  }
 }
 
 //Update client
 export async function updateClient(client: Client): Promise<QueryResult<Client>> {
   try {
-    return await pool.query<Client>(
+    await pool.query('BEGIN');
+    const clientUpdated = await pool.query<Client>(
       `UPDATE client
       SET
         ${client.first_name ? 'first_name = $2,' : ''}
@@ -115,7 +126,12 @@ export async function updateClient(client: Client): Promise<QueryResult<Client>>
       RETURNING *`,
       [client.id, client.first_name, client.last_name, client.email, client.nas]
     );
+    await updateAddress({ id: client.id, ...client.address });
+    await pool.query('COMMIT'); 
+
+    return clientUpdated;
   } catch (err: any) {
+    await pool.query('ROLLBACK');
     if (err.code === '23505') {
       throw { code: 'user-already-exists', message: 'This NAS and/or email is already taken', error: err };
     }
@@ -123,17 +139,65 @@ export async function updateClient(client: Client): Promise<QueryResult<Client>>
   }
 }
 
-//Delete client
+//Delete user
 export async function deleteUser(uid: string, type: 'client' | 'employee' | 'hotel-chain' | undefined): Promise<QueryResult<Client | Employee | HotelChain>> {
   if (!type) throw { code: 'unknown', message: 'Unexpected error' };
   try {
-    return await pool.query<Client>(
+    await pool.query('BEGIN');
+    const userDeleted = await pool.query<Client | Employee | HotelChain>(
       `DELETE FROM ${type}
       WHERE id = $1
       RETURNING *`,
       [uid]
     );
+    await deleteAddress(uid);
+    await pool.query('COMMIT');
+    return userDeleted
   } catch (err: any) {
+    await pool.query('ROLLBACK');
+    throw { code: 'unknown', message: 'Unexpected error', error: err };
+  }
+}
+
+//Delete hotel
+export async function deleteHotel(hotelId: string): Promise<QueryResult<Hotel>> {
+  try {
+    await pool.query('BEGIN');
+    const hotelDeleted = await pool.query<Hotel>(
+      `DELETE FROM hotel
+      WHERE id = $1
+      RETURNING *`,
+      [hotelId]
+    );
+    await deleteAddress(hotelId);
+    await pool.query('COMMIT');
+    
+    return hotelDeleted
+  } catch (err: any) {
+    await pool.query('ROLLBACK');
+    throw { code: 'unknown', message: 'Unexpected error', error: err };
+  }
+}
+
+//Update hotel
+export async function updateHotel(hotel: Hotel): Promise<QueryResult<Hotel>> {
+  try {
+    await pool.query('BEGIN');
+    const hotelUpdated = await pool.query<Hotel>(
+      `UPDATE hotel
+      SET
+        ${hotel.email ? 'email = $2,' : ''}
+        ${hotel.phone ? 'phone = $3' : ''}
+      WHERE id = $1
+      RETURNING *`,
+      [hotel.id, hotel.email, hotel.phone]
+    );
+    await updateAddress({ id: hotel.id, ...hotel.address });
+    await pool.query('COMMIT');
+
+    return hotelUpdated;
+  } catch (err: any) {
+    await pool.query('ROLLBACK');
     throw { code: 'unknown', message: 'Unexpected error', error: err };
   }
 }

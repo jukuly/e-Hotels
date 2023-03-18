@@ -1,6 +1,6 @@
-import { HotelChain, ErrorWithCode, Client } from '../types/interfaces';
+import { HotelChain, ErrorWithCode, Client, Employee } from '../types/interfaces';
 
-export async function saveProfileHotelChain(hotelChain: HotelChain) {
+export async function saveProfileHotelChain(hotelChain: HotelChain): Promise<HotelChain> {
   if (!hotelChain.name || !hotelChain.email || !hotelChain.phone) {
     const error: ErrorWithCode = new Error('Name and/or email and/or phone number missing')
     error.code = 'missing-attributes';
@@ -30,7 +30,7 @@ export async function saveProfileHotelChain(hotelChain: HotelChain) {
   }
 }
 
-export async function saveProfileClient(client: Client) {
+export async function saveProfileClient(client: Client): Promise<Client> {
   if (!client.first_name || !client.last_name || !client.email || !client.nas) {
     const error: ErrorWithCode = new Error('First name and/or last name and/or email and/or NAS missing')
     error.code = 'missing-attributes';
@@ -60,7 +60,7 @@ export async function saveProfileClient(client: Client) {
   }
 }
 
-export async function deleteCurrentUser() {
+export async function deleteCurrentUser(): Promise<Client | Employee | HotelChain> {
   try {
     const response = await fetch('http://localhost:5000/user', {
       method: 'DELETE',

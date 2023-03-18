@@ -1,6 +1,6 @@
-import { Client, QueryResult } from 'pg';
+import { QueryResult } from 'pg';
 import pool from './database';
-import { Address, Hotel, HotelChain, Room, SearchFilters } from './types/interfaces';
+import { Address, Client, Hotel, HotelChain, Room, SearchFilters } from './types/interfaces';
 
 //Select specific hotel chain
 export async function getHotelChain(id: string): Promise<QueryResult<HotelChain>> {

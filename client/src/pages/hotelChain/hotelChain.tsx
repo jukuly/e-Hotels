@@ -1,10 +1,11 @@
 import { RefObject, useEffect, useState } from 'react';
 import { isFilled, isEmailValid, isPhoneValid } from '../../helperFunctions/inputCheck';
-import { saveProfileHotelChain } from '../../database/profileChange';
+import { deleteCurrentUser, saveProfileHotelChain } from '../../database/profileChange';
 import styles from './hotelChain.module.css';
 import { getProfileHotelChain } from '../../database/getter';
 import Profile from '../../components/profile/profile';
 import HotelList from './hotelList/hotelList';
+import { signOut } from '../../database/auth';
 
 export default function () {
   const [initialValue, setInitialValue] = useState<string[]>([]);
@@ -59,12 +60,17 @@ export default function () {
       }
     }
   }
+
+  async function deleteUser() {
+    deleteCurrentUser();
+    signOut();
+  }
   
   return (
     <>
       <main className={styles.hotelChainHome}>
         <div className={styles.box}>
-          <Profile title='Hotel Chain Info' onSave={saveProfile} inputs={[
+          <Profile title='Hotel Chain Info' onSave={saveProfile} onDelete={deleteUser} inputs={[
             {
               name: 'Chain Name',
               type: 'text',

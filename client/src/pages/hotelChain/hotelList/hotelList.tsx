@@ -1,23 +1,28 @@
-import { useEffect, useRef, useState } from 'react';
+import { RefObject, useEffect, useRef, useState } from 'react';
 import { Hotel } from '../../../types/interfaces';
 import styles from './hotelList.module.css'
 import { isEmailValid, isFilled, isNumber, isPhoneValid } from '../../../helperFunctions/inputCheck';
 import { getHotelsFromHotelChain } from '../../../database/getter';
-import { createNewHotel } from '../../../database/setter';
+import { createNewHotel, deleteHotel, updateHotel } from '../../../database/setter';
+import PopUp from '../../../components/popUp/popUp';
+import Profile from '../../../components/profile/profile';
 
 export default function() {
-  const emailRef = useRef<HTMLInputElement>(null);
-  const phoneRef = useRef<HTMLInputElement>(null);
-  const streetNumberRef = useRef<HTMLInputElement>(null);
-  const streetNameRef = useRef<HTMLInputElement>(null);
-  const aptNumberRef = useRef<HTMLInputElement>(null);
-  const cityRef = useRef<HTMLInputElement>(null);
-  const provinceRef = useRef<HTMLInputElement>(null);
-  const zipCodeRef = useRef<HTMLInputElement>(null);
+  const addEmailRef = useRef<HTMLInputElement>(null);
+  const addPhoneRef = useRef<HTMLInputElement>(null);
+  const addStreetNumberRef = useRef<HTMLInputElement>(null);
+  const addStreetNameRef = useRef<HTMLInputElement>(null);
+  const addAptNumberRef = useRef<HTMLInputElement>(null);
+  const addCityRef = useRef<HTMLInputElement>(null);
+  const addProvinceRef = useRef<HTMLInputElement>(null);
+  const addZipCodeRef = useRef<HTMLInputElement>(null);
 
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [addPressed, setAddPressed] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+
+  const [popUpOpen, setOpenPopUpOpen] = useState<boolean>(false);
+  const [popUp, setPopUp] = useState<Hotel | undefined>(undefined);
 
   useEffect(() => {
     const getHotels = async () => {
@@ -35,43 +40,43 @@ export default function() {
   async function addHotel() {
 
     //Every field should be filled (apt can be empty)
-    if (!isFilled(emailRef) || !isFilled(phoneRef) || !isFilled(streetNumberRef) || 
-      !isFilled(streetNameRef) || !isFilled(cityRef) || 
-      !isFilled(provinceRef) || !isFilled(zipCodeRef)) {
+    if (!isFilled(addEmailRef) || !isFilled(addPhoneRef) || !isFilled(addStreetNumberRef) || 
+      !isFilled(addStreetNameRef) || !isFilled(addCityRef) || 
+      !isFilled(addProvinceRef) || !isFilled(addZipCodeRef)) {
       setError('Please fill every field');
       return;
     }
 
-    if (!isEmailValid(emailRef)) {
+    if (!isEmailValid(addEmailRef)) {
       setError('Please enter a valid email address');
       return;
     }
 
-    if (!isPhoneValid(phoneRef)) {
+    if (!isPhoneValid(addPhoneRef)) {
       setError('Please enter a valid phone number');
       return;
     }
 
-    if (!isNumber(streetNumberRef)) {
+    if (!isNumber(addStreetNumberRef)) {
       setError('Please make sure the street number is in a numeric format');
       return;
     }
 
-    if (!isNumber(aptNumberRef) && isFilled(aptNumberRef)) {
+    if (!isNumber(addAptNumberRef) && isFilled(addAptNumberRef)) {
       setError('Please make sure the apt number is in a numeric format');
       return;
     }
 
     const params = {
-      email: emailRef.current?.value.trim()!,
-      phone: parseInt(phoneRef.current?.value.trim()!),
+      email: addEmailRef.current?.value.trim()!,
+      phone: parseInt(addPhoneRef.current?.value.trim()!),
       address: {
-        streetName: streetNameRef.current?.value.trim()!, 
-        streetNumber: parseInt(streetNumberRef.current?.value.trim()!), 
-        aptNumber: parseInt(aptNumberRef.current?.value.trim()!), 
-        city: cityRef.current?.value.trim()!, 
-        province: provinceRef.current?.value.trim()!, 
-        zip: zipCodeRef.current?.value.replace(/\s/g, '')!
+        streetName: addStreetNameRef.current?.value.trim()!, 
+        streetNumber: parseInt(addStreetNumberRef.current?.value.trim()!), 
+        aptNumber: parseInt(addAptNumberRef.current?.value.trim()!), 
+        city: addCityRef.current?.value.trim()!, 
+        province: addProvinceRef.current?.value.trim()!, 
+        zip: addZipCodeRef.current?.value.replace(/\s/g, '')!
       }
     }
 
@@ -90,12 +95,143 @@ export default function() {
     }
   }
 
+  async function modifyHotel(refs: RefObject<HTMLInputElement>[], setError: React.Dispatch<React.SetStateAction<string>>) {
+
+    const [emailRef, phoneRef, streetNumberRef, streetNameRef, aptNumberRef, cityRef, provinceRef, zipCodeRef] = refs;
+
+    //Every field should be filled (apt can be empty)
+    if (!isFilled(emailRef) || !isFilled(phoneRef) || !isFilled(streetNumberRef) || 
+      !isFilled(streetNameRef) || !isFilled(cityRef) || 
+      !isFilled(provinceRef) || !isFilled(zipCodeRef)) {
+      alert('Please fill every field');
+      return;
+    }
+
+    if (!isEmailValid(emailRef)) {
+      alert('Please enter a valid email address');
+      return;
+    }
+
+    if (!isPhoneValid(phoneRef)) {
+      alert('Please enter a valid phone number');
+      return;
+    }
+
+    if (!isNumber(streetNumberRef)) {
+      alert('Please make sure the street number is in a numeric format');
+      return;
+    }
+
+    if (!isNumber(aptNumberRef) && isFilled(aptNumberRef)) {
+      alert('Please make sure the apt number is in a numeric format');
+      return;
+    }
+
+    const params = {
+      email: emailRef.current?.value.trim()!,
+      phone: parseInt(phoneRef.current?.value.trim()!),
+      address: {
+        streetName: streetNameRef.current?.value.trim()!, 
+        streetNumber: parseInt(streetNumberRef.current?.value.trim()!), 
+        aptNumber: parseInt(aptNumberRef.current?.value.trim()!), 
+        city: cityRef.current?.value.trim()!, 
+        province: provinceRef.current?.value.trim()!, 
+        zip: zipCodeRef.current?.value.replace(/\s/g, '')!
+      }
+    }
+
+    try {
+      await updateHotel({ id: popUp?.id, ...params });
+      try {
+        const hotels = await getHotelsFromHotelChain();
+        setHotels(hotels);
+        setOpenPopUpOpen(popUpOpen => !popUpOpen)
+      } catch (err) {
+        console.error(err);
+      }
+    } catch (err: any) {
+      console.error(err);
+    }
+  }
+
+  async function removeHotel(hotelId: string) {
+    await deleteHotel(hotelId)
+    const hotels = await getHotelsFromHotelChain();
+    setHotels(hotels);
+    setOpenPopUpOpen(popUpOpen => !popUpOpen);
+  }
+
+  function openPopUp(hotel: Hotel) {
+    setOpenPopUpOpen(popUpOpen => !popUpOpen);
+    setPopUp(hotel)
+  }
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.hotels}>
+        <PopUp openTrigger={popUpOpen}>
+          <Profile title='Hotel Info' onSave={modifyHotel} onDelete={() => removeHotel(popUp?.id!)} inputs={[
+            {
+              name: 'Email',
+              type: 'text',
+              onChange: (ref) => isEmailValid(ref),
+              maxLength: 40,
+              initialValue: popUp?.email
+            },
+            {
+              name: 'Phone',
+              type: 'text',
+              onChange: (ref) => isPhoneValid(ref),
+              maxLength: 10,
+              initialValue: popUp?.phone?.toString()
+            },
+            {
+              name: 'Street Number',
+              type: 'text',
+              onChange: (ref) => isNumber(ref),
+              maxLength: 10,
+              initialValue: popUp?.address?.street_number?.toString()
+            },
+            {
+              name: 'Street Name',
+              type: 'text',
+              onChange: (ref) => isFilled(ref),
+              maxLength: 40,
+              initialValue: popUp?.address?.street_name
+            },
+            {
+              name: 'Apt Number',
+              type: 'text',
+              onChange: (ref) => isNumber(ref),
+              maxLength: 10,
+              initialValue: popUp?.address?.apt_number?.toString()
+            },
+            {
+              name: 'City',
+              type: 'text',
+              onChange: (ref) => isFilled(ref),
+              maxLength: 20,
+              initialValue: popUp?.address?.city
+            },
+            {
+              name: 'Province',
+              type: 'text',
+              onChange: (ref) => isFilled(ref),
+              maxLength: 20,
+              initialValue: popUp?.address?.province
+            },
+            {
+              name: 'Zip',
+              type: 'text',
+              onChange: (ref) => isFilled(ref),
+              maxLength: 7,
+              initialValue: popUp?.address?.zip
+            }
+          ]} />
+        </PopUp>
         {
           hotels.map(hotel => 
-            <button className={`${styles.box} ${styles.hotelBox}`} key={hotel.id}>
+            <button className={`${styles.box} ${styles.hotelBox}`} key={hotel.id} onClick={() => openPopUp(hotel)}>
               <div>Email: {hotel.email}</div>
               <div>Phone: {hotel.phone}</div>
               <div>Rating: {hotel.rating}</div>
@@ -115,15 +251,15 @@ export default function() {
                 e.preventDefault();
                 addHotel();
               }}>
-                <input type='text' placeholder='Email *' size={1} ref={emailRef} onChange={() => isEmailValid(emailRef)} maxLength={40} />
-                <input type='text' placeholder='Phone Number *' size={1} ref={phoneRef} onChange={() => isPhoneValid(phoneRef)} maxLength={10} inputMode='numeric' />
+                <input type='text' placeholder='Email *' size={1} ref={addEmailRef} onChange={() => isEmailValid(addEmailRef)} maxLength={40} />
+                <input type='text' placeholder='Phone Number *' size={1} ref={addPhoneRef} onChange={() => isPhoneValid(addPhoneRef)} maxLength={10} inputMode='numeric' />
 
-                <input className={styles.one} type='text' placeholder='Number *' size={1} ref={streetNumberRef} onChange={() => isNumber(streetNumberRef)} inputMode='numeric' />
-                <input className={styles.two} type='text' placeholder='Street *' size={1} ref={streetNameRef} onChange={() => isFilled(streetNameRef)} maxLength={40} />
-                <input className={styles.one} type='text' placeholder='Apt' size={1} ref={aptNumberRef} onChange={() => isNumber(aptNumberRef)} inputMode='numeric' />
-                <input className={styles.two} type='text' placeholder='City *' size={1} ref={cityRef} onChange={() => isFilled(cityRef)} maxLength={20} />
-                <input className={styles.two} type='text' placeholder='Province *' size={1} ref={provinceRef} onChange={() => isFilled(provinceRef)} maxLength={20} />
-                <input type='text' placeholder='Zip Code *' size={1} ref={zipCodeRef} onChange={() => isFilled(zipCodeRef)} maxLength={7} />
+                <input className={styles.one} type='text' placeholder='Number *' size={1} ref={addStreetNumberRef} onChange={() => isNumber(addStreetNumberRef)} inputMode='numeric' />
+                <input className={styles.two} type='text' placeholder='Street *' size={1} ref={addStreetNameRef} onChange={() => isFilled(addStreetNameRef)} maxLength={40} />
+                <input className={styles.one} type='text' placeholder='Apt' size={1} ref={addAptNumberRef} onChange={() => isNumber(addAptNumberRef)} inputMode='numeric' />
+                <input className={styles.two} type='text' placeholder='City *' size={1} ref={addCityRef} onChange={() => isFilled(addCityRef)} maxLength={20} />
+                <input className={styles.two} type='text' placeholder='Province *' size={1} ref={addProvinceRef} onChange={() => isFilled(addProvinceRef)} maxLength={20} />
+                <input type='text' placeholder='Zip Code *' size={1} ref={addZipCodeRef} onChange={() => isFilled(addZipCodeRef)} maxLength={7} />
 
                 <div className={styles.belowFields}>
                   <span>{ error }</span>

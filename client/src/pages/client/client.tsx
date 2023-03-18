@@ -2,7 +2,7 @@ import { RefObject, useEffect, useState } from 'react';
 import Profile from '../../components/profile/profile';
 import { signOut } from '../../database/auth';
 import { getProfileClient } from '../../database/getter';
-import { saveProfileClient } from '../../database/profileChange';
+import { deleteCurrentUser, saveProfileClient } from '../../database/profileChange';
 import { isEmailValid, isFilled, isNASValid } from '../../helperFunctions/inputCheck';
 import styles from './client.module.css'
 import SearchRoom from './searchRoom/searchRoom';
@@ -61,12 +61,17 @@ export default function () {
       }
     }
   }
+
+  async function deleteUser() {
+    deleteCurrentUser();
+    signOut();
+  }
   
   return (
     <>
       <main className={styles.clientHome}>
         <div className={styles.box}>
-          <Profile title='Profile' onSave={saveProfile} inputs={[
+          <Profile title='Profile' onSave={saveProfile} onDelete={deleteUser} inputs={[
             {
               name: 'First Name',
               type: 'text',
