@@ -39,12 +39,12 @@ export async function updateHotelChain(hotelChain: HotelChain): Promise<QueryRes
   try {
     return await pool.query<HotelChain>(
       `UPDATE hotel_chain
-        SET
-          ${hotelChain.name ? 'name = $2,' : ''}
-          ${hotelChain.email ? 'email = $3,' : ''}
-          ${hotelChain.phone ? 'phone = $4' : ''}
-        WHERE id = $1
-        RETURNING *`,
+      SET
+        ${hotelChain.name ? 'name = $2,' : ''}
+        ${hotelChain.email ? 'email = $3,' : ''}
+        ${hotelChain.phone ? 'phone = $4' : ''}
+      WHERE id = $1
+      RETURNING *`,
       [hotelChain.id, hotelChain.name, hotelChain.email, hotelChain.phone]
     );
   } catch (err: any) {

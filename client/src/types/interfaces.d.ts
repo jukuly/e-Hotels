@@ -3,11 +3,12 @@ export interface ErrorWithCode extends Error {
 }
 
 export interface SearchFilters {
-  startDate?: Date, 
-  endDate?: Date, 
+  startDate?: string, 
+  endDate?: string, 
   capacity?: number, 
   area?: number, 
   chainName?: string, 
+  city?: string,
   hotelRating?: number, 
   numberOfRoomInHotel?: number, 
   priceMin?: number, 

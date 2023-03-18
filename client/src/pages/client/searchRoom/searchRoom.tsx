@@ -9,6 +9,7 @@ export default function() {
   const capacityRef = useRef<HTMLInputElement>(null);
   const areaRef = useRef<HTMLInputElement>(null);
   const hotelChainRef = useRef<HTMLSelectElement>(null);
+  const cityRef = useRef<HTMLInputElement>(null);
   const hotelRatingRef = useRef<HTMLInputElement>(null);
   const roomCountRef = useRef<HTMLInputElement>(null);
   const priceStartRef = useRef<HTMLInputElement>(null);
@@ -18,11 +19,12 @@ export default function() {
 
   async function search() {
     const rooms = await getRooms({
-      startDate: startDateRef.current?.value ? new Date(startDateRef.current?.value) : undefined,
-      endDate: endDateRef.current?.value ? new Date(endDateRef.current?.value) : undefined,
+      startDate: startDateRef.current?.value ? new Date(startDateRef.current?.value).toISOString() : undefined,
+      endDate: endDateRef.current?.value ? new Date(endDateRef.current?.value).toISOString() : undefined,
       capacity: capacityRef.current?.value ? parseInt(capacityRef.current?.value) : undefined,
       area: areaRef.current?.value ? parseInt(areaRef.current?.value) : undefined,
-      chainName: capacityRef.current?.value,
+      chainName: hotelChainRef.current?.value,
+      city: cityRef.current?.value,
       hotelRating: hotelRatingRef.current?.value ? parseInt(hotelRatingRef.current?.value) : undefined,
       numberOfRoomInHotel: roomCountRef.current?.value ? parseInt(roomCountRef.current?.value) : undefined,
       priceMin: priceStartRef.current?.value ? parseInt(priceStartRef.current?.value) : undefined,
@@ -56,6 +58,10 @@ export default function() {
           <select className={styles.input} ref={hotelChainRef} >
             <option>Hotel chain</option>
           </select>
+        </div>
+        <div className={styles.inputGroup}>
+          <span>City: </span>
+          <input className={styles.input} placeholder='City' type='text' ref={cityRef} size={1} />
         </div>
         <div className={`${styles.inputGroup} ${styles.one}`}>
           <span>Hotel rating: </span>

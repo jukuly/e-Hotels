@@ -3,7 +3,7 @@ import cors from 'cors';
 import pool from './database';
 import { getUserType, isAuthorized, signIn, signUp, verifyJWT } from './auth';
 import { createHotel, deleteUser, updateClient, updateHotelChain } from './editTable';
-import { getAddress, getClient, getHotelChain, getHotelsFromHotelChain } from './selectTable';
+import { getAddress, getClient, getHotelChain, getHotelsFromHotelChain, getRooms } from './selectTable';
 import { Hotel, Room } from './types/interfaces';
 
 const app = express();
@@ -99,9 +99,9 @@ app.post('/update-client',async (req, res) => {
 
 app.delete('/user', async (req, res) => {
   try {
-    const uid = verifyJWT(req.header('Authorization')?.split(' ')[1]);
+    const uid = await isAuthorized(req, 'any');
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
-    const user = await deleteUser(uid, await getUserType(uid));
+    const user = await deleteUser(uid as string, await getUserType(uid as string));
     
     res.status(200).json(user.rows[0]);
   } catch (err) {
@@ -160,56 +160,19 @@ app.get('/client', async (req, res) => {
 });
 
 //Get room search results with filters
-app.get('/room', async (req, res) => {
+app.get('/room-search', async (req, res) => {
   try {
     const uid = await isAuthorized(req, 'any');
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
 
-    const { startDate, endDate, capacity, area, chainName, hotelRating, numberOfRoomInHotel, priceMin, priceMax } = req.body;
+    const filters = JSON.parse(req.query.filters as string);
 
-    const rooms = await pool.query(
-      `SELECT * FROM room
-      ${(startDate && endDate) ? 
-        `WHERE id IN (
-          SELECT id FROM room
-          WHERE 0 = (
-            SELECT COUNT(*) FROM reservation
-            WHERE room_id = room.id
-            WHERE start_date < $1 AND end_date > $1
-          )
-          WHERE 0 = (
-            SELECT COUNT(*) FROM reservation
-            WHERE room_id = room.id
-            WHERE end_date > $2 AND start_date < $2
-          )
-          INTERSECT
-          SELECT id FROM room
-          WHERE 0 = (
-            SELECT COUNT(*) FROM location
-            WHERE room_id = room.id
-            WHERE start_date < $1 AND end_date > $1
-          )
-          WHERE 0 = (
-            SELECT COUNT(*) FROM location
-            WHERE room_id = room.id
-            WHERE end_date > $2 AND start_date < $2
-          )
-        )` : ''
+    const rooms = await getRooms(
+      { 
+        ...filters, 
+        specificHotelId: await getUserType(uid as string) === 'employee' ? 
+          (await pool.query('SELECT hotel_id FROM employee WHERE id = $1', [uid])).rows[0] : uid
       }
-      ${capacity ? 'WHERE capacity > $3' : ''}
-      ${area ? 'WHERE area > $4' : ''}
-      ${chainName ? `WHERE (
-        SELECT name FROM hotel_chain 
-        WHERE id = (
-          SELECT hotel_chain_id FROM hotel 
-          WHERE id = room.hotel_id
-        )
-      ) = $5` : ''}
-      ${hotelRating ? `WHERE (SELECT rating FROM hotel WHERE id = room.hotel_id) > $6` : ''}
-      ${numberOfRoomInHotel ? 'WHERE (SELECT COUNT(*) FROM room WHERE hotel_id = room.hotel_id) > $7' : ''}
-      ${priceMin ? 'WHERE price >= $8' : ''}
-      ${priceMax ? 'WHERE price <= $9' : ''}`,
-      [startDate.toISOString(), endDate.toISOString(), capacity, area, chainName, hotelRating, numberOfRoomInHotel, priceMin, priceMax]
     );
 
     const roomsResponse = await Promise.all(
