@@ -78,7 +78,7 @@ export async function getRooms(filters: SearchFilters): Promise<Room[]> {
       }
     });
 
-    const responseData = await response.json();
+    const responseData = (await response.json()).rooms;
 
     if (!response.ok) {
       const error: ErrorWithCode = new Error(responseData.message)
