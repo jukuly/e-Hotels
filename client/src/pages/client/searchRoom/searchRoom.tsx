@@ -56,7 +56,6 @@ export default function() {
         <div className={styles.inputGroup}>
           <span>Hotel chain: </span>
           <select className={styles.input} ref={hotelChainRef} >
-            <option>Hotel chain</option>
           </select>
         </div>
         <div className={styles.inputGroup}>

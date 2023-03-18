@@ -23,7 +23,6 @@
   margin-bottom: 1.5rem;
 }
 
-
 .box:has(.hotels) {
   display: flex;
   flex-direction: column;

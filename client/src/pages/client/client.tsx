@@ -3,7 +3,7 @@ import Profile from '../../components/profile/profile';
 import { signOut } from '../../database/auth';
 import { getProfileClient } from '../../database/getter';
 import { deleteCurrentUser, saveProfileClient } from '../../database/profileChange';
-import { isEmailValid, isFilled, isNASValid } from '../../helperFunctions/inputCheck';
+import { isEmailValid, isFilled, isNASValid, isNumber } from '../../helperFunctions/inputCheck';
 import styles from './client.module.css'
 import SearchRoom from './searchRoom/searchRoom';
 
@@ -14,7 +14,18 @@ export default function () {
     const getProfile = async () => {
       try {
         const profile = await getProfileClient();
-        setInitialValue([profile.first_name!, profile.last_name!, profile.email!, profile.nas!.toString()]);
+        setInitialValue([
+          profile.first_name!, 
+          profile.last_name!, 
+          profile.email!, 
+          profile.nas!.toString(),
+          profile.address?.street_number?.toString()!, 
+          profile.address?.street_name!, 
+          profile.address?.apt_number?.toString()!,
+          profile.address?.city!,
+          profile.address?.province!,
+          profile.address?.zip!
+        ]);
       } catch (err) {
         console.error(err);
       }
@@ -25,10 +36,12 @@ export default function () {
 
   async function saveProfile(refs: RefObject<HTMLInputElement>[], setError: React.Dispatch<React.SetStateAction<string>>) {
 
-    const [firstNameRef, lastNameRef, emailRef, nasRef] = refs;
+    const [firstNameRef, lastNameRef, emailRef, nasRef, streetNumberRef, streetNameRef, aptNumberRef, cityRef, provinceRef, zipCodeRef] = refs;
 
     //Every field should be filled
-    if (!isFilled(firstNameRef) || !isFilled(lastNameRef) || !isFilled(emailRef) || !isFilled(nasRef)) {
+    if (!isFilled(firstNameRef) || !isFilled(lastNameRef) || !isFilled(emailRef) || 
+      !isFilled(nasRef) || !isFilled(streetNumberRef) || !isFilled(streetNameRef) || 
+      !isFilled(cityRef) || !isFilled(provinceRef) || !isFilled(zipCodeRef)) {
       setError('Please fill every field');
       return;
     }
@@ -43,11 +56,29 @@ export default function () {
       return;
     }
 
+    if (!isNumber(streetNumberRef)) {
+      setError('Please make sure the street number is in a numeric format');
+      return;
+    }
+
+    if (!isNumber(aptNumberRef) && isFilled(aptNumberRef)) {
+      setError('Please make sure the apt number is in a numeric format');
+      return;
+    }
+
     const params = {
       first_name: firstNameRef.current?.value.trim()!, 
       last_name: lastNameRef.current?.value.trim()!,
       email: emailRef.current?.value.trim()!,
-      nas: parseInt(nasRef.current?.value.trim()!)
+      nas: parseInt(nasRef.current?.value.trim()!),
+      address: {
+        streetName: streetNameRef.current?.value.trim()!, 
+        streetNumber: parseInt(streetNumberRef.current?.value.trim()!), 
+        aptNumber: parseInt(aptNumberRef.current?.value.trim()!), 
+        city: cityRef.current?.value.trim()!, 
+        province: provinceRef.current?.value.trim()!, 
+        zip: zipCodeRef.current?.value.replace(/\s/g, '')!
+      }
     }
 
     try {
@@ -69,6 +100,7 @@ export default function () {
   
   return (
     <>
+      <button className='signOutButton' onClick={() => signOut()}>Sign Out</button>
       <main className={styles.clientHome}>
         <div className={styles.box}>
           <Profile title='Profile' onSave={saveProfile} onDelete={deleteUser} inputs={[
@@ -99,6 +131,48 @@ export default function () {
               onChange: (ref) => isNASValid(ref),
               maxLength: 9,
               initialValue: initialValue[3]
+            },
+            {
+              name: 'Street Number',
+              type: 'text',
+              onChange: (ref) => isNumber(ref),
+              maxLength: 10,
+              initialValue: initialValue[4]
+            },
+            {
+              name: 'Street Name',
+              type: 'text',
+              onChange: (ref) => isFilled(ref),
+              maxLength: 40,
+              initialValue: initialValue[5]
+            },
+            {
+              name: 'Apt Number',
+              type: 'text',
+              onChange: (ref) => isNumber(ref),
+              maxLength: 10,
+              initialValue: initialValue[6]
+            },
+            {
+              name: 'City',
+              type: 'text',
+              onChange: (ref) => isFilled(ref),
+              maxLength: 20,
+              initialValue: initialValue[7]
+            },
+            {
+              name: 'Province',
+              type: 'text',
+              onChange: (ref) => isFilled(ref),
+              maxLength: 20,
+              initialValue: initialValue[8]
+            },
+            {
+              name: 'Zip',
+              type: 'text',
+              onChange: (ref) => isFilled(ref),
+              maxLength: 7,
+              initialValue: initialValue[9]
             }
           ]} />
         </div>

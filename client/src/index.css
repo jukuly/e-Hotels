@@ -60,3 +60,24 @@ input.error {
   border-color: red;
 }
 
+.signOutButton {
+  position: fixed;
+  top: 0.75rem;
+  right: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  background-color: transparent;
+  border: solid #444444 2px;
+  color: white;
+  cursor: pointer;
+  transition: border-color 300ms;
+}
+
+.signOutButton:hover {
+  border-color: #094900;
+}
+
+.signOutButton:active {
+  border-width: 3px;
+  padding: calc(0.5rem - 1px) calc(0.75rem - 1px);
+}

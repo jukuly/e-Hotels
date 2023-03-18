@@ -1,5 +1,5 @@
 import { RefObject, useEffect, useState } from 'react';
-import { isFilled, isEmailValid, isPhoneValid } from '../../helperFunctions/inputCheck';
+import { isFilled, isEmailValid, isPhoneValid, isNumber } from '../../helperFunctions/inputCheck';
 import { deleteCurrentUser, saveProfileHotelChain } from '../../database/profileChange';
 import styles from './hotelChain.module.css';
 import { getProfileHotelChain } from '../../database/getter';
@@ -14,7 +14,17 @@ export default function () {
     const getProfile = async () => {
       try {
         const profile = await getProfileHotelChain();
-        setInitialValue([profile.name!, profile.email!, profile.phone!.toString()]);
+        setInitialValue([
+          profile.name!, 
+          profile.email!, 
+          profile.phone!.toString(), 
+          profile.address?.street_number?.toString()!, 
+          profile.address?.street_name!, 
+          profile.address?.apt_number?.toString()!,
+          profile.address?.city!,
+          profile.address?.province!,
+          profile.address?.zip!
+        ]);
       } catch (err) {
         console.error(err);
       }
@@ -25,10 +35,12 @@ export default function () {
 
   async function saveProfile(refs: RefObject<HTMLInputElement>[], setError: React.Dispatch<React.SetStateAction<string>>) {
 
-    const [nameRef, emailRef, phoneRef] = refs;
+    const [nameRef, emailRef, phoneRef, streetNumberRef, streetNameRef, aptNumberRef, cityRef, provinceRef, zipCodeRef] = refs;
 
     //Every field should be filled
-    if (!isFilled(nameRef) || !isFilled(emailRef) || !isFilled(phoneRef)) {
+    if (!isFilled(nameRef) || !isFilled(emailRef) || !isFilled(phoneRef) ||
+      !isFilled(streetNumberRef) || !isFilled(streetNameRef) || !isFilled(cityRef) || 
+      !isFilled(provinceRef) || !isFilled(zipCodeRef)) {
       setError('Please fill every field');
       return;
     }
@@ -43,10 +55,28 @@ export default function () {
       return;
     }
 
+    if (!isNumber(streetNumberRef)) {
+      setError('Please make sure the street number is in a numeric format');
+      return;
+    }
+
+    if (!isNumber(aptNumberRef) && isFilled(aptNumberRef)) {
+      setError('Please make sure the apt number is in a numeric format');
+      return;
+    }
+
     const params = {
       name: nameRef.current?.value.trim()!, 
       email: emailRef.current?.value.trim()!,
-      phone: parseInt(phoneRef.current?.value.trim()!)
+      phone: parseInt(phoneRef.current?.value.trim()!),
+      address: {
+        streetName: streetNameRef.current?.value.trim()!, 
+        streetNumber: parseInt(streetNumberRef.current?.value.trim()!), 
+        aptNumber: parseInt(aptNumberRef.current?.value.trim()!), 
+        city: cityRef.current?.value.trim()!, 
+        province: provinceRef.current?.value.trim()!, 
+        zip: zipCodeRef.current?.value.replace(/\s/g, '')!
+      }
     }
 
     try {
@@ -68,6 +98,7 @@ export default function () {
   
   return (
     <>
+      <button className='signOutButton' onClick={() => signOut()}>Sign Out</button>
       <main className={styles.hotelChainHome}>
         <div className={styles.box}>
           <Profile title='Hotel Chain Info' onSave={saveProfile} onDelete={deleteUser} inputs={[
@@ -91,6 +122,48 @@ export default function () {
               onChange: (ref) => isPhoneValid(ref),
               maxLength: 10,
               initialValue: initialValue[2]
+            },
+            {
+              name: 'Street Number',
+              type: 'text',
+              onChange: (ref) => isNumber(ref),
+              maxLength: 10,
+              initialValue: initialValue[3]
+            },
+            {
+              name: 'Street Name',
+              type: 'text',
+              onChange: (ref) => isFilled(ref),
+              maxLength: 40,
+              initialValue: initialValue[4]
+            },
+            {
+              name: 'Apt Number',
+              type: 'text',
+              onChange: (ref) => isNumber(ref),
+              maxLength: 10,
+              initialValue: initialValue[5]
+            },
+            {
+              name: 'City',
+              type: 'text',
+              onChange: (ref) => isFilled(ref),
+              maxLength: 20,
+              initialValue: initialValue[6]
+            },
+            {
+              name: 'Province',
+              type: 'text',
+              onChange: (ref) => isFilled(ref),
+              maxLength: 20,
+              initialValue: initialValue[7]
+            },
+            {
+              name: 'Zip',
+              type: 'text',
+              onChange: (ref) => isFilled(ref),
+              maxLength: 7,
+              initialValue: initialValue[8]
             }
           ]} />
         </div>

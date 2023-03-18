@@ -62,7 +62,8 @@ export interface HotelChain {
   name?: string,
   email?: string,
   phone?: number,
-  password?: string
+  password?: string,
+  address?: Address
 }
 
 export interface Room {
