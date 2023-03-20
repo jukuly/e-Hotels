@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { useAuthState } from './database/auth';
 import NotSignedIn from './guards/notSignedIn';
 import SignedIn from './guards/signedIn';
 import HotelChain from './pages/hotelChain/hotelChain';
@@ -9,7 +8,6 @@ import SignIn from './pages/signIn/signIn';
 import SignUp from './pages/signUp/signUp';
 
 export default function () {
-  const user = useAuthState();
 
   return (
     <>
