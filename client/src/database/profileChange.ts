@@ -60,6 +60,36 @@ export async function saveProfileClient(client: Client): Promise<Client> {
   }
 }
 
+export async function saveProfileEmployee(employee: Employee): Promise<Employee> {
+  if (!employee.first_name || !employee.last_name || !employee.email || !employee.nas) {
+    const error: ErrorWithCode = new Error('First name and/or last name and/or email and/or NAS missing')
+    error.code = 'missing-attributes';
+    throw error;
+  }
+  try {
+    const response = await fetch('http://localhost:5000/update-employee', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+      },
+      body: JSON.stringify(employee)
+    });
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      const error: ErrorWithCode = new Error(responseData.message)
+      error.code = responseData.code;
+      throw error;
+    } 
+    
+    return responseData;
+  } catch (err) {
+    throw err;
+  }
+}
+
 export async function deleteCurrentUser(): Promise<Client | Employee | HotelChain> {
   try {
     const response = await fetch('http://localhost:5000/user', {

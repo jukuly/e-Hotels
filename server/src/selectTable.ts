@@ -1,6 +1,6 @@
 import { QueryResult } from 'pg';
 import pool from './database';
-import { Address, Client, Hotel, HotelChain, Room, SearchFilters } from './types/interfaces';
+import { Address, Client, Employee, Hotel, HotelChain, Room, SearchFilters } from './types/interfaces';
 
 //Select specific hotel chain
 export async function getHotelChain(id: string): Promise<QueryResult<HotelChain>> {
@@ -33,6 +33,15 @@ export async function getAddress(id: string): Promise<QueryResult<Address>> {
 export async function getClient(id: String): Promise<QueryResult<Client>> {
   return await pool.query<Client>(
     `SELECT * FROM client
+    WHERE id = $1`,
+    [id]
+  );
+}
+
+//Select an employee
+export async function getEmployee(id: String): Promise<QueryResult<Employee>> {
+  return await pool.query<Employee>(
+    `SELECT * FROM employee
     WHERE id = $1`,
     [id]
   );

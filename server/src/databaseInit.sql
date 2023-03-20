@@ -26,7 +26,7 @@ CREATE TABLE hotel (
   rating INT,
   email VARCHAR(40) NOT NULL,
   phone BIGINT NOT NULL,
-  FOREIGN KEY (hotel_chain_id) REFERENCES hotel_chain ON UPDATE CASCADE,
+  FOREIGN KEY (hotel_chain_id) REFERENCES hotel_chain ON UPDATE CASCADE ON DELETE CASCADE,
   CHECK (email ~ '^[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*([.][a-zA-Z]{2,3})+$'),
   CHECK (rating >= 0 AND rating <= 5),
   CHECK (phone >= 0 AND phone <= 9999999999)
@@ -41,7 +41,7 @@ CREATE TABLE employee (
   hotel_id UUID NOT NULL,
   roles VARCHAR(20)[],
   password VARCHAR NOT NULL,
-  FOREIGN KEY (hotel_id) REFERENCES hotel ON UPDATE CASCADE,
+  FOREIGN KEY (hotel_id) REFERENCES hotel ON UPDATE CASCADE ON DELETE CASCADE,
   CHECK (email ~ '^[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*([.][a-zA-Z]{2,3})+$'),
   CHECK (nas >= 0 AND nas <= 999999999)
 );
@@ -69,7 +69,7 @@ CREATE TABLE room (
   issues TEXT[],
   hotel_id UUID NOT NULL,
   area INT NOT NULL,
-  FOREIGN KEY (hotel_id) REFERENCES hotel ON UPDATE CASCADE,
+  FOREIGN KEY (hotel_id) REFERENCES hotel ON UPDATE CASCADE ON DELETE CASCADE,
   CHECK (price >= 0),
   CHECK (capacity >= 0),
   CHECK (area >= 0)
@@ -77,22 +77,22 @@ CREATE TABLE room (
 
 CREATE TABLE reservation (
   id UUID DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
-  room_id UUID NOT NULL,
-  client_id UUID NOT NULL,
+  room_id UUID,
+  client_id UUID,
   start_date TIMESTAMPTZ NOT NULL,
   end_date TIMESTAMPTZ NOT NULL,
-  FOREIGN KEY (client_id) REFERENCES client ON UPDATE CASCADE,
-  FOREIGN KEY (room_id) REFERENCES room ON UPDATE CASCADE,
+  FOREIGN KEY (client_id) REFERENCES client ON UPDATE CASCADE ON DELETE SET NULL,
+  FOREIGN KEY (room_id) REFERENCES room ON UPDATE CASCADE ON DELETE SET NULL,
   CHECK (end_date >= start_date)
 );
 
 CREATE TABLE location (
   id UUID DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
-  room_id UUID NOT NULL,
-  client_id UUID NOT NULL,
+  room_id UUID,
+  client_id UUID,
   start_date TIMESTAMPTZ DEFAULT NOW(),
   end_date TIMESTAMPTZ NOT NULL,
-  FOREIGN KEY (client_id) REFERENCES client ON UPDATE CASCADE,
-  FOREIGN KEY (room_id) REFERENCES room ON UPDATE CASCADE,
+  FOREIGN KEY (client_id) REFERENCES client ON UPDATE CASCADE ON DELETE SET NULL,
+  FOREIGN KEY (room_id) REFERENCES room ON UPDATE CASCADE ON DELETE SET NULL,
   CHECK (end_date >= start_date)
 );

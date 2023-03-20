@@ -20,7 +20,9 @@ export async function signIn({ email, password }: { email: string, password: str
   );
 
   if (userData.rowCount === 0) throw { code: 'invalid-credentials', message: 'Email or Password incorrect' };
-  if (await bcrypt.compare(password, userData.rows[0].password)) return createJWT(userData.rows[0].id, '2h');
+  for (let user of userData.rows) {
+    if (await bcrypt.compare(password, user.password)) return createJWT(user.id, '5h');
+  }
   
   throw { code: 'invalid-credentials', message: 'Email or Password incorrect' };
 }
