@@ -12,7 +12,8 @@ export interface SearchFilters {
   hotelRating?: number, 
   numberOfRoomInHotel?: number, 
   priceMin?: number, 
-  priceMax?: number
+  priceMax?: number,
+  specificHotelId?: string
 }
 
 export interface Client {
@@ -33,7 +34,7 @@ export interface Employee {
   first_name?: string, 
   last_name?: string, 
   address?: Address, 
-  hotel_id?: number, 
+  hotel_id?: string, 
   roles?: string[], 
   password?: string
 }
@@ -75,7 +76,7 @@ export interface Room {
   mountain_vue?: boolean,
   extendable?: boolean,
   issues?: string[],
-  hotel_dd?: string,
+  hotel_id?: string,
   area?: number
 }
 

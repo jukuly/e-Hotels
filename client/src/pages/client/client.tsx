@@ -34,7 +34,7 @@ export default function () {
     getProfile();
   }, []);
 
-  async function saveProfile(refs: RefObject<HTMLInputElement>[], setError: React.Dispatch<React.SetStateAction<string>>) {
+  async function saveProfile(refs: RefObject<HTMLInputElement>[], setError: React.Dispatch<React.SetStateAction<string>>): Promise<boolean> {
 
     const [firstNameRef, lastNameRef, emailRef, nasRef, streetNumberRef, streetNameRef, aptNumberRef, cityRef, provinceRef, zipCodeRef] = refs;
 
@@ -43,27 +43,27 @@ export default function () {
       !isFilled(nasRef) || !isFilled(streetNumberRef) || !isFilled(streetNameRef) || 
       !isFilled(cityRef) || !isFilled(provinceRef) || !isFilled(zipCodeRef)) {
       setError('Please fill every field');
-      return;
+      return false;
     }
 
     if (!isEmailValid(emailRef)) {
       setError('Please enter a valid email address');
-      return;
+      return false;
     }
 
     if (!isNASValid(nasRef)) {
       setError('Please make sure the NAS is a number of length 9');
-      return;
+      return false;
     }
 
     if (!isNumber(streetNumberRef)) {
       setError('Please make sure the street number is in a numeric format');
-      return;
+      return false;
     }
 
     if (!isNumber(aptNumberRef) && isFilled(aptNumberRef)) {
       setError('Please make sure the apt number is in a numeric format');
-      return;
+      return false;
     }
 
     const params = {
@@ -83,19 +83,25 @@ export default function () {
 
     try {
       await saveProfileClient(params);
-      setError('');
+      return true;
     } catch (err: any) {
       if (err.code === 'user-already-exists') {
         setError('This name and/or email and/or NAS is already taken');
       } else {
         console.error(err);
       }
+      return false;
     }
   }
 
   async function deleteUser() {
-    deleteCurrentUser();
-    signOut();
+    try {
+      await deleteCurrentUser();
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
   }
   
   return (
@@ -103,7 +109,7 @@ export default function () {
       <button className='signOutButton' onClick={() => signOut()}>Sign Out</button>
       <main className={styles.clientHome}>
         <div className={styles.box}>
-          <Profile title='Profile' onSave={saveProfile} onDelete={deleteUser} inputs={[
+          <Profile title='Profile' editable={true} onSave={saveProfile} onDelete={deleteUser} inputs={[
             {
               name: 'First Name',
               type: 'text',

@@ -82,20 +82,13 @@ export default function() {
 
     try {
       await createNewHotel(params);
-      setError('');
-      setAddPressed(false);
-      try {
-        const hotels = await getHotelsFromHotelChain();
-        setHotels(hotels);
-      } catch (err) {
-        console.error(err);
-      }
+      window.location.reload();
     } catch (err: any) {
       console.error(err);
     }
   }
 
-  async function modifyHotel(refs: RefObject<HTMLInputElement>[], setError: React.Dispatch<React.SetStateAction<string>>) {
+  async function modifyHotel(refs: RefObject<HTMLInputElement>[], setError: React.Dispatch<React.SetStateAction<string>>): Promise<boolean> {
 
     const [emailRef, phoneRef, streetNumberRef, streetNameRef, aptNumberRef, cityRef, provinceRef, zipCodeRef] = refs;
 
@@ -103,28 +96,28 @@ export default function() {
     if (!isFilled(emailRef) || !isFilled(phoneRef) || !isFilled(streetNumberRef) || 
       !isFilled(streetNameRef) || !isFilled(cityRef) || 
       !isFilled(provinceRef) || !isFilled(zipCodeRef)) {
-      alert('Please fill every field');
-      return;
+      setError('Please fill every field');
+      return false;
     }
 
     if (!isEmailValid(emailRef)) {
-      alert('Please enter a valid email address');
-      return;
+      setError('Please enter a valid email address');
+      return false;
     }
 
     if (!isPhoneValid(phoneRef)) {
-      alert('Please enter a valid phone number');
-      return;
+      setError('Please enter a valid phone number');
+      return false;
     }
 
     if (!isNumber(streetNumberRef)) {
-      alert('Please make sure the street number is in a numeric format');
-      return;
+      setError('Please make sure the street number is in a numeric format');
+      return false;
     }
 
     if (!isNumber(aptNumberRef) && isFilled(aptNumberRef)) {
-      alert('Please make sure the apt number is in a numeric format');
-      return;
+      setError('Please make sure the apt number is in a numeric format');
+      return false;
     }
 
     const params = {
@@ -142,23 +135,21 @@ export default function() {
 
     try {
       await updateHotel({ id: popUp?.id, ...params });
-      try {
-        const hotels = await getHotelsFromHotelChain();
-        setHotels(hotels);
-        setOpenPopUpOpen(popUpOpen => !popUpOpen)
-      } catch (err) {
-        console.error(err);
-      }
+      return true;
     } catch (err: any) {
       console.error(err);
+      return false;
     }
   }
 
   async function removeHotel(hotelId: string) {
-    await deleteHotel(hotelId)
-    const hotels = await getHotelsFromHotelChain();
-    setHotels(hotels);
-    setOpenPopUpOpen(popUpOpen => !popUpOpen);
+    try {
+      await deleteHotel(hotelId)
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
   }
 
   function openPopUp(hotel: Hotel) {
@@ -170,7 +161,7 @@ export default function() {
     <div className={styles.wrapper}>
       <div className={styles.hotels}>
         <PopUp openTrigger={popUpOpen}>
-          <Profile title='Hotel Info' onSave={modifyHotel} onDelete={() => removeHotel(popUp?.id!)} inputs={[
+          <Profile title='Hotel Info' editable={true} onSave={modifyHotel} onDelete={() => removeHotel(popUp?.id!)} inputs={[
             {
               name: 'Email',
               type: 'text',

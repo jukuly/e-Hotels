@@ -4,7 +4,7 @@ import pool from './database';
 import { getUserType, isAuthorized, signIn, signUp, verifyJWT } from './auth';
 import { createHotel, deleteHotel, deleteUser, updateClient, updateEmployee, updateHotel, updateHotelChain } from './editTable';
 import { getAddress, getClient, getEmployee, getHotelChain, getHotelsFromHotelChain, getRooms } from './selectTable';
-import { Hotel, HotelChain, Client } from './types/interfaces';
+import { Hotel, HotelChain, Client, Employee } from './types/interfaces';
 
 const app = express();
 
@@ -241,7 +241,7 @@ app.get('/room-search', async (req, res) => {
       { 
         ...filters, 
         specificHotelId: await getUserType(uid as string) === 'employee' ? 
-          (await pool.query('SELECT hotel_id FROM employee WHERE id = $1', [uid])).rows[0] : uid
+          (await pool.query<Employee>('SELECT hotel_id FROM employee WHERE id = $1', [uid])).rows[0].hotel_id : uid
       }
     );
 

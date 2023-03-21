@@ -1,0 +1,119 @@
+.box {
+  background-color: rgba(255, 255, 255, 0.025);
+  border-radius: 10px;
+  padding: 3rem;
+  color: #ffffff;
+}
+
+.wrapper {
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: calc(100vh - 13.25rem);
+}
+
+.rooms {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.roomBox {
+  padding: 1.5rem;
+}
+
+.roomBox:is(button) {
+  border: none;
+  cursor: pointer;
+  transition: 300ms;
+}
+
+.addRoom {
+  display: grid;
+  place-content: center;
+  font-size: 4rem;
+}
+
+.roomBox:is(button):hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+.roomBox:is(button):active {
+  background-color: rgba(255, 255, 255, 0.075);
+}
+
+.addRoomForm {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.addRoomForm > * {
+  min-width: 40ch;
+  grid-column: span 4;
+}
+
+.addRoomForm .two {
+  min-width: 20ch;
+  grid-column: span 2;
+}
+
+.addRoomForm .one {
+  min-width: 10ch;
+  grid-column: span 1;
+}
+
+.belowFields {
+  grid-column: span 4;
+  display: flex;
+  justify-content: space-between;
+}
+
+.belowFields span {
+  font-size: 0.75rem;
+  color: red;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border: solid 2px transparent;
+}
+
+.addRoomButton {
+  align-self: flex-end;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  background-color: transparent;
+  border: solid #444444 2px;
+  color: inherit;
+  cursor: pointer;
+  transition: border-color 300ms;
+}
+
+.addRoomButton:hover {
+  border-color: #540099;
+}
+
+.addRoomButton:active {
+  border-width: 3px;
+  padding: calc(0.5rem - 1px) calc(0.75rem - 1px);
+}
+
+.underlineWrapper {
+  display: grid;
+  place-items: center;
+}
+
+.underlineWrapper .underline {
+  text-align: center;
+  margin-top: 1.5rem;
+
+  background-image: linear-gradient(#540099, #540099);
+  background-size: 0% 0.1em;
+  background-position-y: 100%;
+  background-position-x: 0%;
+  background-repeat: no-repeat;
+  transition: background-size 150ms ease-in-out;
+
+  cursor: pointer;
+}
+
+.underlineWrapper .underline:hover {
+  background-size: 100% 0.1em;
+}

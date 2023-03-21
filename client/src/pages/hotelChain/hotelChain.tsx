@@ -33,7 +33,7 @@ export default function () {
     getProfile();
   }, []);
 
-  async function saveProfile(refs: RefObject<HTMLInputElement>[], setError: React.Dispatch<React.SetStateAction<string>>) {
+  async function saveProfile(refs: RefObject<HTMLInputElement>[], setError: React.Dispatch<React.SetStateAction<string>>): Promise<boolean> {
 
     const [nameRef, emailRef, phoneRef, streetNumberRef, streetNameRef, aptNumberRef, cityRef, provinceRef, zipCodeRef] = refs;
 
@@ -42,27 +42,27 @@ export default function () {
       !isFilled(streetNumberRef) || !isFilled(streetNameRef) || !isFilled(cityRef) || 
       !isFilled(provinceRef) || !isFilled(zipCodeRef)) {
       setError('Please fill every field');
-      return;
+      return true;
     }
 
     if (!isEmailValid(emailRef)) {
       setError('Please enter a valid email address');
-      return;
+      return true;
     }
 
     if (!isPhoneValid(phoneRef)) {
       setError('Please make sure the phone number is in a numeric format');
-      return;
+      return true;
     }
 
     if (!isNumber(streetNumberRef)) {
       setError('Please make sure the street number is in a numeric format');
-      return;
+      return true;
     }
 
     if (!isNumber(aptNumberRef) && isFilled(aptNumberRef)) {
       setError('Please make sure the apt number is in a numeric format');
-      return;
+      return true;
     }
 
     const params = {
@@ -81,19 +81,25 @@ export default function () {
 
     try {
       await saveProfileHotelChain(params);
-      setError('');
+      return true;
     } catch (err: any) {
       if (err.code === 'hotel-chain-already-exists') {
         setError('This name and/or email and/or phone number is already taken');
       } else {
         console.error(err);
       }
+      return false;
     }
   }
 
   async function deleteUser() {
-    deleteCurrentUser();
-    signOut();
+    try {
+      await deleteCurrentUser();
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
   }
   
   return (
@@ -101,7 +107,7 @@ export default function () {
       <button className='signOutButton' onClick={() => signOut()}>Sign Out</button>
       <main className={styles.hotelChainHome}>
         <div className={styles.box}>
-          <Profile title='Hotel Chain Info' onSave={saveProfile} onDelete={deleteUser} inputs={[
+          <Profile title='Hotel Chain Info' editable={true} onSave={saveProfile} onDelete={deleteUser} inputs={[
             {
               name: 'Chain Name',
               type: 'text',
