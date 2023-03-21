@@ -1,4 +1,4 @@
-import { ErrorWithCode, Hotel } from "../types/interfaces";
+import { ErrorWithCode, Hotel, Room } from "../types/interfaces";
 
 export async function createNewHotel(newHotel: Hotel): Promise<Hotel> {
   try {
@@ -62,6 +62,101 @@ export async function updateHotel(hotel: Hotel): Promise<Hotel> {
 export async function deleteHotel(hotelId: string): Promise<Hotel> {
   try {
     const response = await fetch(`http://localhost:5000/hotel/${hotelId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+      }
+    });
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      const error: ErrorWithCode = new Error(responseData.message)
+      error.code = responseData.code;
+      throw error;
+    } 
+    
+    return responseData;
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function createNewRoom(newRoom: Room): Promise<Room> {
+  try {
+    const response = await fetch('http://localhost:5000/room', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+      },
+      body: JSON.stringify({ 
+        price: newRoom.price,
+        commodities: newRoom.commodities,
+        capacity: newRoom.capacity,
+        sea_vue: newRoom.sea_vue,
+        mountain_vue: newRoom.mountain_vue,
+        extendable: newRoom.extendable,
+        issues: newRoom.issues,
+        hotel_id: newRoom.hotel_id,
+        area: newRoom.area
+      })
+    })
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      const error: ErrorWithCode = new Error(responseData.message)
+      error.code = responseData.code;
+      throw error;
+    }
+
+    return responseData;
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function updateRoom(room: Room): Promise<Room> {
+  try {
+    const response = await fetch(`http://localhost:5000/update-room`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+      },
+      body: JSON.stringify({ 
+        id: room.id,
+        price: room.price,
+        commodities: room.commodities,
+        capacity: room.capacity,
+        sea_vue: room.sea_vue,
+        mountain_vue: room.mountain_vue,
+        extendable: room.extendable,
+        issues: room.issues,
+        hotel_id: room.hotel_id,
+        area: room.area
+      })
+    });
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      const error: ErrorWithCode = new Error(responseData.message)
+      error.code = responseData.code;
+      throw error;
+    } 
+    
+    return responseData;
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function deleteRoom(roomId: string): Promise<Room> {
+  try {
+    const response = await fetch(`http://localhost:5000/room/${roomId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

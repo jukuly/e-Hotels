@@ -6,6 +6,7 @@ import { getRooms } from '../../../database/getter';
 import PopUp from '../../../components/popUp/popUp';
 import Profile from '../../../components/profile/profile';
 import listToStringProfile from '../../../helperFunctions/listToStringProfile';
+import { createNewRoom, deleteRoom, updateRoom } from '../../../database/setter';
 
 export default function({ hotelId, isManager }: { hotelId: string | undefined, isManager: boolean }) {
   const addPriceRef = useRef<HTMLInputElement>(null);
@@ -75,7 +76,7 @@ export default function({ hotelId, isManager }: { hotelId: string | undefined, i
     }
 
     try {
-      //await createNewHotel(params);
+      await createNewRoom(params);
       setError('');
       setAddPressed(false);
       try {
@@ -129,7 +130,7 @@ export default function({ hotelId, isManager }: { hotelId: string | undefined, i
     }
 
     try {
-      //await updateRoom({ id: popUp?.id, ...params });
+      await updateRoom({ id: popUp?.id, ...params });
       return true;
     } catch (err: any) {
       console.error(err);
@@ -139,7 +140,7 @@ export default function({ hotelId, isManager }: { hotelId: string | undefined, i
 
   async function removeRoom(roomId: string): Promise<boolean> {
     try {
-      //await deleteRoom(roomId)
+    await deleteRoom(roomId)
       return true;
     } catch (e) {
       console.error(e);

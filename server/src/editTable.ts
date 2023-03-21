@@ -1,41 +1,7 @@
 import { QueryResult } from 'pg';
 import { hashPassword } from './auth';
 import pool from './database';
-import { Address, Client, Employee, Hotel, HotelChain } from './types/interfaces';
-
-//Create client
-export async function createClient(client: Client): Promise<QueryResult<Client>> {
-
-  await pool.query('BEGIN');
-  const clientCreated = await pool.query(
-    `INSERT INTO client (email, nas, first_name, last_name, password) 
-    VALUES ($1, $2, $3, $4, $5) 
-    RETURNING *`,
-    [client.email, client.nas, client.first_name, client.last_name, client.password]
-  );
-  await addAddress({ id: clientCreated.rows[0].id, ...client.address });
-  await pool.query('COMMIT');
-
-  return clientCreated;
-}
-
-//Create employee
-export async function createEmployee(employee: Employee): Promise<QueryResult<Employee>> {
-
-  await pool.query('BEGIN');
-  const employeeCreated = await pool.query(
-    `INSERT INTO employee (email, nas, first_name, last_name, hotel_id, roles, password) 
-    VALUES ($1, $2, $3, $4, $5, $6, $7) 
-    RETURNING *`,
-    [employee.email, employee.nas, employee.first_name, employee.last_name, employee.hotel_id, employee.roles, employee.password]
-  );
-  const addressNoId = employee.address;
-  addressNoId!.id = employeeCreated.rows[0].id;
-  await addAddress(addressNoId!);
-  await pool.query('COMMIT');
-
-  return employeeCreated;
-}
+import { Address, Client, Employee, Hotel, HotelChain, Room } from './types/interfaces';
 
 //Create address
 async function addAddress(address: Address): Promise<QueryResult<Address>> {
@@ -67,6 +33,97 @@ async function deleteAddress(id: string): Promise<QueryResult<Address>> {
   );
 }
 
+//Create client
+export async function createClient(client: Client): Promise<QueryResult<Client>> {
+
+  await pool.query('BEGIN');
+  const clientCreated = await pool.query(
+    `INSERT INTO client (email, nas, first_name, last_name, password) 
+    VALUES ($1, $2, $3, $4, $5) 
+    RETURNING *`,
+    [client.email, client.nas, client.first_name, client.last_name, client.password]
+  );
+  await addAddress({ id: clientCreated.rows[0].id, ...client.address });
+  await pool.query('COMMIT');
+
+  return clientCreated;
+}
+
+//Update client
+export async function updateClient(client: Client): Promise<QueryResult<Client>> {
+  try {
+    await pool.query('BEGIN');
+    const clientUpdated = await pool.query<Client>(
+      `UPDATE client
+      SET
+        ${client.first_name ? 'first_name = $2,' : ''}
+        ${client.last_name ? 'last_name = $3,' : ''}
+        ${client.email ? 'email = $4,' : ''}
+        ${client.nas ? 'nas = $5' : ''}
+      WHERE id = $1
+      RETURNING *`,
+      [client.id, client.first_name, client.last_name, client.email, client.nas]
+    );
+    await updateAddress({ id: client.id, ...client.address });
+    await pool.query('COMMIT'); 
+
+    return clientUpdated;
+  } catch (err: any) {
+    await pool.query('ROLLBACK');
+    if (err.code === '23505') {
+      throw { code: 'user-already-exists', message: 'This NAS and/or email is already taken', error: err };
+    }
+    throw { code: 'unknown', message: 'Unexpected error', error: err };
+  }
+}
+
+//Create employee
+export async function createEmployee(employee: Employee): Promise<QueryResult<Employee>> {
+
+  await pool.query('BEGIN');
+  const employeeCreated = await pool.query(
+    `INSERT INTO employee (email, nas, first_name, last_name, hotel_id, roles, password) 
+    VALUES ($1, $2, $3, $4, $5, $6, $7) 
+    RETURNING *`,
+    [employee.email, employee.nas, employee.first_name, employee.last_name, employee.hotel_id, employee.roles, employee.password]
+  );
+  const addressNoId = employee.address;
+  addressNoId!.id = employeeCreated.rows[0].id;
+  await addAddress(addressNoId!);
+  await pool.query('COMMIT');
+
+  return employeeCreated;
+}
+
+//Update employee
+export async function updateEmployee(employee: Employee): Promise<QueryResult<Employee>> {
+  try {
+    await pool.query('BEGIN');
+    const employeeUpdated = await pool.query<Employee>(
+      `UPDATE employee
+      SET
+        ${employee.first_name ? 'first_name = $2,' : ''}
+        ${employee.last_name ? 'last_name = $3,' : ''}
+        ${employee.email ? 'email = $4,' : ''}
+        ${employee.nas ? 'nas = $5,' : ''}
+        ${employee.roles ? 'roles = $6' : ''}
+      WHERE id = $1
+      RETURNING *`,
+      [employee.id, employee.first_name, employee.last_name, employee.email, employee.nas, employee.roles]
+    );
+    await updateAddress({ id: employee.id, ...employee.address });
+    await pool.query('COMMIT'); 
+
+    return employeeUpdated;
+  } catch (err: any) {
+    await pool.query('ROLLBACK');
+    if (err.code === '23505') {
+      throw { code: 'user-already-exists', message: 'This NAS and/or email is already taken', error: err };
+    }
+    throw { code: 'unknown', message: 'Unexpected error', error: err };
+  }
+}
+
 //Update hotel chain
 export async function updateHotelChain(hotelChain: HotelChain): Promise<QueryResult<HotelChain>> {
   try {
@@ -90,6 +147,26 @@ export async function updateHotelChain(hotelChain: HotelChain): Promise<QueryRes
     if (err.code === '23505') {
       throw { code: 'hotel-chain-already-exists', message: 'This name and/or email and/or phone number is already taken', error: err };
     }
+    throw { code: 'unknown', message: 'Unexpected error', error: err };
+  }
+}
+
+//Delete user
+export async function deleteUser(uid: string, type: 'client' | 'employee' | 'hotel-chain' | undefined): Promise<QueryResult<Client | Employee | HotelChain>> {
+  if (!type) throw { code: 'unknown', message: 'Unexpected error' };
+  try {
+    await pool.query('BEGIN');
+    const userDeleted = await pool.query<Client | Employee | HotelChain>(
+      `DELETE FROM ${type}
+      WHERE id = $1
+      RETURNING *`,
+      [uid]
+    );
+    await deleteAddress(uid);
+    await pool.query('COMMIT');
+    return userDeleted
+  } catch (err: any) {
+    await pool.query('ROLLBACK');
     throw { code: 'unknown', message: 'Unexpected error', error: err };
   }
 }
@@ -126,77 +203,23 @@ export async function createHotel(hotel: Hotel): Promise<QueryResult<Hotel>> {
   }
 }
 
-//Update client
-export async function updateClient(client: Client): Promise<QueryResult<Client>> {
+//Update hotel
+export async function updateHotel(hotel: Hotel): Promise<QueryResult<Hotel>> {
   try {
     await pool.query('BEGIN');
-    const clientUpdated = await pool.query<Client>(
-      `UPDATE client
+    const hotelUpdated = await pool.query<Hotel>(
+      `UPDATE hotel
       SET
-        ${client.first_name ? 'first_name = $2,' : ''}
-        ${client.last_name ? 'last_name = $3,' : ''}
-        ${client.email ? 'email = $4,' : ''}
-        ${client.nas ? 'nas = $5' : ''}
+        ${hotel.email ? 'email = $2,' : ''}
+        ${hotel.phone ? 'phone = $3' : ''}
       WHERE id = $1
       RETURNING *`,
-      [client.id, client.first_name, client.last_name, client.email, client.nas]
+      [hotel.id, hotel.email, hotel.phone]
     );
-    await updateAddress({ id: client.id, ...client.address });
-    await pool.query('COMMIT'); 
-
-    return clientUpdated;
-  } catch (err: any) {
-    await pool.query('ROLLBACK');
-    if (err.code === '23505') {
-      throw { code: 'user-already-exists', message: 'This NAS and/or email is already taken', error: err };
-    }
-    throw { code: 'unknown', message: 'Unexpected error', error: err };
-  }
-}
-
-//Update employee
-export async function updateEmployee(employee: Employee): Promise<QueryResult<Employee>> {
-  try {
-    await pool.query('BEGIN');
-    const employeeUpdated = await pool.query<Employee>(
-      `UPDATE employee
-      SET
-        ${employee.first_name ? 'first_name = $2,' : ''}
-        ${employee.last_name ? 'last_name = $3,' : ''}
-        ${employee.email ? 'email = $4,' : ''}
-        ${employee.nas ? 'nas = $5,' : ''}
-        ${employee.roles ? 'roles = $6' : ''}
-      WHERE id = $1
-      RETURNING *`,
-      [employee.id, employee.first_name, employee.last_name, employee.email, employee.nas, employee.roles]
-    );
-    await updateAddress({ id: employee.id, ...employee.address });
-    await pool.query('COMMIT'); 
-
-    return employeeUpdated;
-  } catch (err: any) {
-    await pool.query('ROLLBACK');
-    if (err.code === '23505') {
-      throw { code: 'user-already-exists', message: 'This NAS and/or email is already taken', error: err };
-    }
-    throw { code: 'unknown', message: 'Unexpected error', error: err };
-  }
-}
-
-//Delete user
-export async function deleteUser(uid: string, type: 'client' | 'employee' | 'hotel-chain' | undefined): Promise<QueryResult<Client | Employee | HotelChain>> {
-  if (!type) throw { code: 'unknown', message: 'Unexpected error' };
-  try {
-    await pool.query('BEGIN');
-    const userDeleted = await pool.query<Client | Employee | HotelChain>(
-      `DELETE FROM ${type}
-      WHERE id = $1
-      RETURNING *`,
-      [uid]
-    );
-    await deleteAddress(uid);
+    await updateAddress({ id: hotel.id, ...hotel.address });
     await pool.query('COMMIT');
-    return userDeleted
+
+    return hotelUpdated;
   } catch (err: any) {
     await pool.query('ROLLBACK');
     throw { code: 'unknown', message: 'Unexpected error', error: err };
@@ -223,25 +246,59 @@ export async function deleteHotel(hotelId: string): Promise<QueryResult<Hotel>> 
   }
 }
 
-//Update hotel
-export async function updateHotel(hotel: Hotel): Promise<QueryResult<Hotel>> {
+//Create room
+export async function createRoom(room: Room): Promise<QueryResult<Room>> {
   try {
-    await pool.query('BEGIN');
-    const hotelUpdated = await pool.query<Hotel>(
-      `UPDATE hotel
+    const roomCreated = await pool.query<Room>(
+      `INSERT INTO room (price, commodities, capacity, sea_vue, mountain_vue, extendable, issues, hotel_id, area) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
+      RETURNING *`,
+      [room.price, room.commodities, room.capacity, room.sea_vue, room.mountain_vue, room.extendable, room.issues, room.hotel_id, room.area]
+    );
+  
+    return roomCreated;
+  } catch (err: any) {
+    throw { code: 'unknown', message: 'Unexpected error', error: err };
+  }
+}
+
+//Update room
+export async function updateRoom(room: Room): Promise<QueryResult<Room>> {
+  try {
+    const roomUpdated = await pool.query<Room>(
+      `UPDATE room
       SET
-        ${hotel.email ? 'email = $2,' : ''}
-        ${hotel.phone ? 'phone = $3' : ''}
+        ${room.price ? 'price = $2,' : ''}
+        ${room.commodities ? 'commodities = $3' : ''}
+        ${room.capacity ? 'capacity = $4' : ''}
+        ${room.sea_vue ? 'sea_vue = $5' : ''}
+        ${room.mountain_vue ? 'mountain_vue = $6' : ''}
+        ${room.extendable ? 'extendable = $7' : ''}
+        ${room.issues ? 'issues = $8' : ''}
+        ${room.area ? 'area = $9' : ''}
       WHERE id = $1
       RETURNING *`,
-      [hotel.id, hotel.email, hotel.phone]
+      [room.id, room.price, room.commodities, room.capacity, room.sea_vue, room.mountain_vue, room.extendable, room.issues, room.area]
     );
-    await updateAddress({ id: hotel.id, ...hotel.address });
-    await pool.query('COMMIT');
 
-    return hotelUpdated;
+    return roomUpdated;
   } catch (err: any) {
-    await pool.query('ROLLBACK');
+    throw { code: 'unknown', message: 'Unexpected error', error: err };
+  }
+}
+
+//Delete room
+export async function deleteRoom(roomId: string): Promise<QueryResult<Room>> {
+  try {
+    const roomDeleted = await pool.query<Room>(
+      `DELETE FROM room
+      WHERE id = $1
+      RETURNING *`,
+      [roomId]
+    );
+    
+    return roomDeleted
+  } catch (err: any) {
     throw { code: 'unknown', message: 'Unexpected error', error: err };
   }
 }
