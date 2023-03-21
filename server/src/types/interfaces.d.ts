@@ -88,6 +88,7 @@ export interface Location {
   id?: string,
   room_id?: string,
   client_id?: string,
+  employee_id?: string,
   start_date?: Date,
   end_date?: Date,
 }
