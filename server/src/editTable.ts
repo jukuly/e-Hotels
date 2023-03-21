@@ -1,7 +1,7 @@
 import { QueryResult } from 'pg';
 import { hashPassword } from './auth';
 import pool from './database';
-import { Address, Client, Employee, Hotel, HotelChain, Room } from './types/interfaces';
+import { Address, Client, Employee, Hotel, HotelChain, Reservation, Room } from './types/interfaces';
 
 //Create address
 async function addAddress(address: Address): Promise<QueryResult<Address>> {
@@ -298,6 +298,19 @@ export async function deleteRoom(roomId: string): Promise<QueryResult<Room>> {
     );
     
     return roomDeleted
+  } catch (err: any) {
+    throw { code: 'unknown', message: 'Unexpected error', error: err };
+  }
+}
+
+//Create reservation
+export async function createReservation(reservation: Reservation): Promise<void> {
+  try {
+    await pool.query(
+      `INSERT INTO reservation (room_id, client_id, start_date, end_date) 
+      VALUES ($1, $2, $3, $4)`,
+      [reservation.room_id, reservation.client_id, reservation.start_date, reservation.end_date]
+    );
   } catch (err: any) {
     throw { code: 'unknown', message: 'Unexpected error', error: err };
   }

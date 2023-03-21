@@ -117,7 +117,7 @@ export async function getProfileEmployee(): Promise<Employee> {
 
 export async function getRooms(filters: SearchFilters): Promise<Room[]> {
   try {
-    const response = await fetch(`http://localhost:5000/room-search?filters=${JSON.stringify(filters)}`, {
+    const response = await fetch(`http://localhost:5000/room?filters=${JSON.stringify(filters)}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('jwt')}`

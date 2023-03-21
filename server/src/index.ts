@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import pool from './database';
 import { getUserType, isAuthorized, signIn, signUp, verifyJWT } from './auth';
-import { createHotel, createRoom, deleteHotel, deleteRoom, deleteUser, updateClient, updateEmployee, updateHotel, updateHotelChain, updateRoom } from './editTable';
+import { createHotel, createReservation, createRoom, deleteHotel, deleteRoom, deleteUser, updateClient, updateEmployee, updateHotel, updateHotelChain, updateRoom } from './editTable';
 import { getAddress, getClient, getEmployee, getHotelById, getHotelChain, getHotelsFromHotelChain, getRooms } from './selectTable';
 import { Hotel, HotelChain, Client, Employee } from './types/interfaces';
 
@@ -70,6 +70,36 @@ app.post('/room', async (req, res) => {
     const room = await createRoom({ ...req.body });
 
     res.status(200).json(room.rows[0]);   
+  } catch (err) {
+    console.error(err);
+    res.status(400).json(err);
+  }
+});
+
+app.post('/reserve-room', async (req, res) => {
+  try {
+    const uid = await isAuthorized(req, ['client']);
+    if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
+    const numberOfReservations = (await pool.query(
+      `SELECT COUNT(*) FROM reservation 
+      WHERE ((start_date < $1 AND end_date > $1) OR (end_date > $2 AND start_date < $2)) AND room_id = $3`, 
+      [req.body.start_date, req.body.end_date, req.body.room_id]
+    )).rows[0].count;
+
+    const numberOfLocations = (await pool.query(
+      `SELECT COUNT(*) FROM location 
+      WHERE ((start_date < $1 AND end_date > $1) OR (end_date > $2 AND start_date < $2)) AND room_id = $3`, 
+      [req.body.start_date, req.body.end_date, req.body.room_id]
+    )).rows[0].count;
+
+    if (numberOfReservations > 0 || numberOfLocations > 0) {
+      res.status(400).json({ message: 'This time interval is already occupied.', code: 'invalid-time-interval' });
+      return;
+    }
+
+    await createReservation({ client_id: uid as string, ...req.body });
+
+    res.status(200).json({ success: true });   
   } catch (err) {
     console.error(err);
     res.status(400).json(err);
@@ -283,8 +313,7 @@ app.get('/employee', async (req, res) => {
   }
 });
 
-//Get room search results with filters
-app.get('/room-search', async (req, res) => {
+app.get('/room', async (req, res) => {
   try {
     const uid = await isAuthorized(req, ['client', 'employee']);
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
@@ -295,7 +324,7 @@ app.get('/room-search', async (req, res) => {
       { 
         ...filters, 
         specificHotelId: await getUserType(uid as string) === 'employee' ? 
-          (await pool.query<Employee>('SELECT hotel_id FROM employee WHERE id = $1', [uid])).rows[0].hotel_id : uid
+          (await pool.query<Employee>('SELECT hotel_id FROM employee WHERE id = $1', [uid])).rows[0].hotel_id : null
       }
     );
 

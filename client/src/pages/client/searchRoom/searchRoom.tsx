@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react';
+import PopUp from '../../../components/popUp/popUp';
 import { getRooms } from '../../../database/getter';
-import { Room } from '../../../types/interfaces';
+import { reserveRoom } from '../../../database/reservations';
+import { ErrorWithCode, Room } from '../../../types/interfaces';
 import styles from './searchRoom.module.css';
 
 export default function() {
@@ -15,7 +17,12 @@ export default function() {
   const priceStartRef = useRef<HTMLInputElement>(null);
   const priceEndRef = useRef<HTMLInputElement>(null);
 
+  const startDateReserveRef = useRef<HTMLInputElement>(null);
+  const endDateReserveRef = useRef<HTMLInputElement>(null);
+
   const [results, setResults] = useState<Room[]>([]);
+  const [popUpOpen, setOpenPopUpOpen] = useState<boolean>(false);
+  const [popUp, setPopUp] = useState<Room | undefined>(undefined);
 
   async function search() {
     const rooms = await getRooms({
@@ -31,6 +38,32 @@ export default function() {
       priceMax: priceEndRef.current?.value ? parseInt(priceEndRef.current?.value) : undefined
     });
     setResults(rooms);
+  }
+
+  function openPopUp(room: Room) {
+    setOpenPopUpOpen(popUpOpen => !popUpOpen);
+    setPopUp(room)
+  }
+
+  async function reserve() {
+    try {
+      await reserveRoom(
+        { 
+          room_id: popUp?.id!, 
+          start_date: new Date(startDateReserveRef.current?.value!).toISOString(), 
+          end_date: new Date(endDateReserveRef.current?.value!).toISOString()
+        }
+      );
+      alert('Room reserved successfully!');
+      window.location.reload();
+    } catch(err: any) {
+      if (err.code === 'invalid-time-interval') {
+        alert('This time interval is already occupied.');
+      } else {
+        alert('An error has occured.');
+      }
+      console.error(err);
+    }
   }
 
   return (
@@ -76,14 +109,26 @@ export default function() {
           <input className={styles.input} placeholder='Max' type='text' inputMode='numeric' ref={priceEndRef} size={1} />
         </div>
         <div className={styles.buttonWrapper}>
-          <button className={styles.searchButton} type='submit'>Search</button>
+          <button className={styles.button} type='submit'>Search</button>
         </div>
       </form>
 
+      <PopUp openTrigger={popUpOpen}>
+        <form className={styles.reservationForm} onSubmit={e => {
+          e.preventDefault();
+          reserve();
+        }}>
+          <span>Start Date: </span>
+          <input className={styles.input} type='date' ref={startDateReserveRef} min={new Date().toISOString().slice(0, 10)} max='2030-12-31' size={1} />
+          <span>End Date: </span>
+          <input className={styles.input} type='date' ref={endDateReserveRef} min={new Date().toISOString().slice(0, 10)} max='2030-12-31' size={1} /> 
+          <button className={`${styles.button} ${styles.reserve}`} type='submit'>Reserve</button>
+        </form>
+      </PopUp>
       <div className={styles.results}>
         {
           results.map(room => 
-            <button className={`${styles.box} ${styles.roomBox}`} key={room.id}>
+            <button className={`${styles.box} ${styles.roomBox}`} key={room.id} onClick={() => openPopUp(room)}>
               <div>Price: {room.price}</div>
               <div>Capacity: {room.capacity}</div>
               <div>Sea vue: {room.sea_vue ? 'Yes' : 'No'}</div>

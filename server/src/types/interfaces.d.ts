@@ -18,7 +18,7 @@ export interface Client {
   nas?: number, 
   first_name?: string, 
   last_name?: string, 
-  registration_date?: Date,
+  registration_date?: string,
   address?: Address, 
   password?: string 
 }
@@ -80,8 +80,8 @@ export interface Reservation {
   id?: string,
   room_id?: string,
   client_id?: string,
-  start_date?: Date,
-  end_date?: Date,
+  start_date?: string,
+  end_date?: string,
 }
 
 export interface Location {
@@ -89,6 +89,6 @@ export interface Location {
   room_id?: string,
   client_id?: string,
   employee_id?: string,
-  start_date?: Date,
-  end_date?: Date,
+  start_date?: string,
+  end_date?: string,
 }
