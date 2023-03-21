@@ -20,6 +20,15 @@ export async function getHotelsFromHotelChain(id: string): Promise<QueryResult<H
   );
 }
 
+//Select hotel with its id
+export async function getHotelById(id: string): Promise<QueryResult<Hotel>> {
+  return await pool.query<Hotel>(
+    `SELECT * FROM hotel
+    WHERE id = $1`,
+    [id]
+  );
+}
+
 //Select the address of a specific id
 export async function getAddress(id: string): Promise<QueryResult<Address>> {
   return await pool.query<Address>(

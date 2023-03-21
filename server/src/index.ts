@@ -3,7 +3,7 @@ import cors from 'cors';
 import pool from './database';
 import { getUserType, isAuthorized, signIn, signUp, verifyJWT } from './auth';
 import { createHotel, createRoom, deleteHotel, deleteRoom, deleteUser, updateClient, updateEmployee, updateHotel, updateHotelChain, updateRoom } from './editTable';
-import { getAddress, getClient, getEmployee, getHotelChain, getHotelsFromHotelChain, getRooms } from './selectTable';
+import { getAddress, getClient, getEmployee, getHotelById, getHotelChain, getHotelsFromHotelChain, getRooms } from './selectTable';
 import { Hotel, HotelChain, Client, Employee } from './types/interfaces';
 
 const app = express();
@@ -224,6 +224,21 @@ app.get('/hotel', async (req, res) => {
     ) as Hotel[];
     
     res.status(200).json({ hotels: hotelsResponse });   
+  } catch (err) {
+    console.error(err);
+    res.status(400).json(err);
+  }
+});
+
+app.get('/hotel/:hotelId', async (req, res) => {
+  try {
+    const uid = await isAuthorized(req, ['employee']);
+    if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
+    const hotel = await getHotelById(req.params.hotelId);
+
+    const hotelResponse = { ...hotel.rows[0], address: (await getAddress(hotel.rows[0].id!)).rows[0] } as Hotel;
+    
+    res.status(200).json(hotelResponse);   
   } catch (err) {
     console.error(err);
     res.status(400).json(err);

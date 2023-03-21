@@ -46,6 +46,29 @@ export async function getHotelsFromHotelChain(): Promise<Hotel[]> {
   }
 }
 
+export async function getHotelById(id: string): Promise<Hotel> {
+  try {
+    const response = await fetch(`http://localhost:5000/hotel/${id}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+      }
+    });
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      const error: ErrorWithCode = new Error(responseData.message)
+      error.code = responseData.code;
+      throw error;
+    } 
+    
+    return responseData;
+  } catch (err) {
+    throw err;
+  }
+}
+
 export async function getProfileClient(): Promise<Client> {
   try {
     const response = await fetch('http://localhost:5000/client', {

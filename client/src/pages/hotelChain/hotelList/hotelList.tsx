@@ -3,9 +3,10 @@ import { Hotel } from '../../../types/interfaces';
 import styles from './hotelList.module.css'
 import { isEmailValid, isFilled, isNumber, isPhoneValid } from '../../../helperFunctions/inputCheck';
 import { getHotelsFromHotelChain } from '../../../database/getter';
-import { createNewHotel, deleteHotel, updateHotel } from '../../../database/setter';
+import { createNewHotel } from '../../../database/setter';
 import PopUp from '../../../components/popUp/popUp';
 import Profile from '../../../components/profile/profile';
+import { modifyHotel, removeHotel } from '../../../helperFunctions/hotelFunctions';
 
 export default function() {
   const addEmailRef = useRef<HTMLInputElement>(null);
@@ -88,70 +89,6 @@ export default function() {
     }
   }
 
-  async function modifyHotel(refs: RefObject<HTMLInputElement>[], setError: React.Dispatch<React.SetStateAction<string>>): Promise<boolean> {
-
-    const [emailRef, phoneRef, streetNumberRef, streetNameRef, aptNumberRef, cityRef, provinceRef, zipCodeRef] = refs;
-
-    //Every field should be filled (apt can be empty)
-    if (!isFilled(emailRef) || !isFilled(phoneRef) || !isFilled(streetNumberRef) || 
-      !isFilled(streetNameRef) || !isFilled(cityRef) || 
-      !isFilled(provinceRef) || !isFilled(zipCodeRef)) {
-      setError('Please fill every field');
-      return false;
-    }
-
-    if (!isEmailValid(emailRef)) {
-      setError('Please enter a valid email address');
-      return false;
-    }
-
-    if (!isPhoneValid(phoneRef)) {
-      setError('Please enter a valid phone number');
-      return false;
-    }
-
-    if (!isNumber(streetNumberRef)) {
-      setError('Please make sure the street number is in a numeric format');
-      return false;
-    }
-
-    if (!isNumber(aptNumberRef) && isFilled(aptNumberRef)) {
-      setError('Please make sure the apt number is in a numeric format');
-      return false;
-    }
-
-    const params = {
-      email: emailRef.current?.value.trim()!,
-      phone: parseInt(phoneRef.current?.value.trim()!),
-      address: {
-        streetName: streetNameRef.current?.value.trim()!, 
-        streetNumber: parseInt(streetNumberRef.current?.value.trim()!), 
-        aptNumber: parseInt(aptNumberRef.current?.value.trim()!), 
-        city: cityRef.current?.value.trim()!, 
-        province: provinceRef.current?.value.trim()!, 
-        zip: zipCodeRef.current?.value.replace(/\s/g, '')!
-      }
-    }
-
-    try {
-      await updateHotel({ id: popUp?.id, ...params });
-      return true;
-    } catch (err: any) {
-      console.error(err);
-      return false;
-    }
-  }
-
-  async function removeHotel(hotelId: string) {
-    try {
-      await deleteHotel(hotelId)
-      return true;
-    } catch (e) {
-      console.error(e);
-      return false;
-    }
-  }
-
   function openPopUp(hotel: Hotel) {
     setOpenPopUpOpen(popUpOpen => !popUpOpen);
     setPopUp(hotel)
@@ -161,64 +98,68 @@ export default function() {
     <div className={styles.wrapper}>
       <div className={styles.hotels}>
         <PopUp openTrigger={popUpOpen}>
-          <Profile title='Hotel Info' editable={true} onSave={modifyHotel} onDelete={() => removeHotel(popUp?.id!)} inputs={[
-            {
-              name: 'Email',
-              type: 'text',
-              onChange: (ref) => isEmailValid(ref),
-              maxLength: 40,
-              initialValue: popUp?.email
-            },
-            {
-              name: 'Phone',
-              type: 'text',
-              onChange: (ref) => isPhoneValid(ref),
-              maxLength: 10,
-              initialValue: popUp?.phone?.toString()
-            },
-            {
-              name: 'Street Number',
-              type: 'text',
-              onChange: (ref) => isNumber(ref),
-              maxLength: 10,
-              initialValue: popUp?.address?.street_number?.toString()
-            },
-            {
-              name: 'Street Name',
-              type: 'text',
-              onChange: (ref) => isFilled(ref),
-              maxLength: 40,
-              initialValue: popUp?.address?.street_name
-            },
-            {
-              name: 'Apt Number',
-              type: 'text',
-              onChange: (ref) => isNumber(ref),
-              maxLength: 10,
-              initialValue: popUp?.address?.apt_number?.toString()
-            },
-            {
-              name: 'City',
-              type: 'text',
-              onChange: (ref) => isFilled(ref),
-              maxLength: 20,
-              initialValue: popUp?.address?.city
-            },
-            {
-              name: 'Province',
-              type: 'text',
-              onChange: (ref) => isFilled(ref),
-              maxLength: 20,
-              initialValue: popUp?.address?.province
-            },
-            {
-              name: 'Zip',
-              type: 'text',
-              onChange: (ref) => isFilled(ref),
-              maxLength: 7,
-              initialValue: popUp?.address?.zip
-            }
-          ]} />
+          <Profile title='Hotel Info' editable={true} 
+            onSave={(refs: RefObject<HTMLInputElement>[], setError: React.Dispatch<React.SetStateAction<string>>) => modifyHotel(refs, setError, popUp?.id!)} 
+            onDelete={() => removeHotel(popUp?.id!)} 
+            inputs={[
+              {
+                name: 'Email',
+                type: 'text',
+                onChange: (ref) => isEmailValid(ref),
+                maxLength: 40,
+                initialValue: popUp?.email
+              },
+              {
+                name: 'Phone',
+                type: 'text',
+                onChange: (ref) => isPhoneValid(ref),
+                maxLength: 10,
+                initialValue: popUp?.phone?.toString()
+              },
+              {
+                name: 'Street Number',
+                type: 'text',
+                onChange: (ref) => isNumber(ref),
+                maxLength: 10,
+                initialValue: popUp?.address?.street_number?.toString()
+              },
+              {
+                name: 'Street Name',
+                type: 'text',
+                onChange: (ref) => isFilled(ref),
+                maxLength: 40,
+                initialValue: popUp?.address?.street_name
+              },
+              {
+                name: 'Apt Number',
+                type: 'text',
+                onChange: (ref) => isNumber(ref),
+                maxLength: 10,
+                initialValue: popUp?.address?.apt_number?.toString()
+              },
+              {
+                name: 'City',
+                type: 'text',
+                onChange: (ref) => isFilled(ref),
+                maxLength: 20,
+                initialValue: popUp?.address?.city
+              },
+              {
+                name: 'Province',
+                type: 'text',
+                onChange: (ref) => isFilled(ref),
+                maxLength: 20,
+                initialValue: popUp?.address?.province
+              },
+              {
+                name: 'Zip',
+                type: 'text',
+                onChange: (ref) => isFilled(ref),
+                maxLength: 7,
+                initialValue: popUp?.address?.zip
+              }
+            ]}
+           />
         </PopUp>
         {
           hotels.map(hotel => 

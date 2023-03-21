@@ -1,16 +1,19 @@
 import { RefObject, useEffect, useState } from 'react';
 import Profile from '../../components/profile/profile';
 import { signOut } from '../../database/auth';
-import { getProfileEmployee } from '../../database/getter';
+import { getHotelById, getProfileEmployee } from '../../database/getter';
 import { deleteCurrentUser, saveProfileEmployee } from '../../database/profileChange';
-import { isEmailValid, isFilled, isNASValid, isNumber } from '../../helperFunctions/inputCheck';
+import { removeHotel, modifyHotel } from '../../helperFunctions/hotelFunctions';
+import { isEmailValid, isFilled, isNASValid, isNumber, isPhoneValid } from '../../helperFunctions/inputCheck';
 import listToStringProfile from '../../helperFunctions/listToStringProfile';
+import { Hotel } from '../../types/interfaces';
 import styles from './employee.module.css'
 import RoomList from './roomList/roomList';
 
 export default function () {
   const [initialValue, setInitialValue] = useState<string[]>([]);
   const [hotelId, setHotelId] = useState<string | undefined>(undefined);
+  const [hotel, setHotel] = useState<Hotel | undefined>(undefined);
   const [isManager, setIsManager] = useState<boolean>(false);
 
   useEffect(() => {
@@ -34,6 +37,11 @@ export default function () {
 
         setHotelId(profile.hotel_id);
         setIsManager(profile.roles?.includes('manager')!)
+
+        if (profile.roles?.includes('manager')!) {
+          const hotel = await getHotelById(profile.hotel_id!);
+          setHotel(hotel);
+        }
       } catch (err) {
         console.error(err);
       }
@@ -198,6 +206,71 @@ export default function () {
             }
           ]} />
         </div>
+        {
+          isManager &&
+          <div className={styles.box}>
+            <Profile title='Hotel Info' editable={true} 
+              onSave={(refs: RefObject<HTMLInputElement>[], setError: React.Dispatch<React.SetStateAction<string>>) => modifyHotel(refs, setError, hotelId!)} 
+              onDelete={() => removeHotel(hotelId!)}  inputs={[
+              {
+                name: 'Email',
+                type: 'text',
+                onChange: (ref) => isEmailValid(ref),
+                maxLength: 40,
+                initialValue: hotel?.email
+              },
+              {
+                name: 'Phone',
+                type: 'text',
+                onChange: (ref) => isPhoneValid(ref),
+                maxLength: 10,
+                initialValue: hotel?.phone?.toString()
+              },
+              {
+                name: 'Street Number',
+                type: 'text',
+                onChange: (ref) => isNumber(ref),
+                maxLength: 10,
+                initialValue: hotel?.address?.street_number?.toString()
+              },
+              {
+                name: 'Street Name',
+                type: 'text',
+                onChange: (ref) => isFilled(ref),
+                maxLength: 40,
+                initialValue: hotel?.address?.street_name
+              },
+              {
+                name: 'Apt Number',
+                type: 'text',
+                onChange: (ref) => isNumber(ref),
+                maxLength: 10,
+                initialValue: hotel?.address?.apt_number?.toString()
+              },
+              {
+                name: 'City',
+                type: 'text',
+                onChange: (ref) => isFilled(ref),
+                maxLength: 20,
+                initialValue: hotel?.address?.city
+              },
+              {
+                name: 'Province',
+                type: 'text',
+                onChange: (ref) => isFilled(ref),
+                maxLength: 20,
+                initialValue: hotel?.address?.province
+              },
+              {
+                name: 'Zip',
+                type: 'text',
+                onChange: (ref) => isFilled(ref),
+                maxLength: 7,
+                initialValue: hotel?.address?.zip
+              }
+            ]} />
+          </div>
+        }
         <div className={styles.box}>
           <h1 className={styles.boxTitle}>Rooms</h1>
           <RoomList hotelId={hotelId} isManager={isManager} />
