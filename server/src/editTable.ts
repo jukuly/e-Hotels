@@ -253,7 +253,7 @@ export async function createRoom(room: Room): Promise<QueryResult<Room>> {
       `INSERT INTO room (price, commodities, capacity, sea_vue, mountain_vue, extendable, issues, hotel_id, area) 
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
       RETURNING *`,
-      [room.price, room.commodities, room.capacity, room.sea_vue, room.mountain_vue, room.extendable, room.issues, room.hotel_id, room.area]
+      [room.price, room.commodities, room.capacity, !!room.sea_vue, !!room.mountain_vue, !!room.extendable, room.issues, room.hotel_id, room.area]
     );
   
     return roomCreated;
@@ -269,16 +269,16 @@ export async function updateRoom(room: Room): Promise<QueryResult<Room>> {
       `UPDATE room
       SET
         ${room.price ? 'price = $2,' : ''}
-        ${room.commodities ? 'commodities = $3' : ''}
-        ${room.capacity ? 'capacity = $4' : ''}
-        ${room.sea_vue ? 'sea_vue = $5' : ''}
-        ${room.mountain_vue ? 'mountain_vue = $6' : ''}
-        ${room.extendable ? 'extendable = $7' : ''}
-        ${room.issues ? 'issues = $8' : ''}
+        ${room.commodities ? 'commodities = $3,' : ''}
+        ${room.capacity ? 'capacity = $4,' : ''}
+        sea_vue = $5,
+        mountain_vue = $6,
+        extendable = $7,
+        ${room.issues ? 'issues = $8,' : ''}
         ${room.area ? 'area = $9' : ''}
       WHERE id = $1
       RETURNING *`,
-      [room.id, room.price, room.commodities, room.capacity, room.sea_vue, room.mountain_vue, room.extendable, room.issues, room.area]
+      [room.id, room.price, room.commodities, room.capacity, !!room.sea_vue, !!room.mountain_vue, !!room.extendable, room.issues, room.area]
     );
 
     return roomUpdated;

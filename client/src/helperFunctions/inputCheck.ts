@@ -2,8 +2,7 @@ import { RefObject } from "react";
 
 export function isNumber(inputRef: RefObject<HTMLInputElement>): boolean {
   const value = inputRef.current?.value.trim();
-  if (isNaN(parseInt(value!)) || !isFinite(parseInt(value!)) || 
-    parseInt(value!) !== parseFloat(value!)) {
+  if (isNaN(parseInt(value!)) || !isFinite(parseInt(value!))) {
     inputRef.current?.classList.add('error');
     return false;
   } else {

@@ -118,7 +118,7 @@ export default function({ hotelId, isManager }: { hotelId: string | undefined, i
     }
 
     const params = {
-      price: parseInt(priceRef.current?.value.trim()!),
+      price: parseFloat(priceRef.current?.value.trim()!),
       commodities: commoditiesRef.current?.value.split(', '),
       capacity: parseInt(capacityRef.current?.value.trim()!),
       sea_vue: seaVueRef.current?.checked,
@@ -222,9 +222,9 @@ export default function({ hotelId, isManager }: { hotelId: string | undefined, i
               <div>Price: {room.price}</div>
               <div>Commodities: {listToStringProfile(room.commodities!)}</div>
               <div>Capacity: {room.capacity}</div>
-              <div>Sea Vue: {room.sea_vue}</div>
-              <div>Mountain Vue: {room.mountain_vue}</div>
-              <div>Extendable: {room.extendable}</div>
+              <div>Sea Vue: {room.sea_vue ? 'Yes' : 'No'}</div>
+              <div>Mountain vue: {room.mountain_vue ? 'Yes' : 'No'}</div>
+              <div>Extendable: {room.extendable ? 'Yes' : 'No'}</div>
               <div>Issues: {listToStringProfile(room.issues!)}</div>
               <div>Area: {room.area}</div>
             </button>
