@@ -15,6 +15,7 @@ export default function () {
   const [hotelId, setHotelId] = useState<string | undefined>(undefined);
   const [hotel, setHotel] = useState<Hotel | undefined>(undefined);
   const [isManager, setIsManager] = useState<boolean>(false);
+  const [profileVisible, setProfileVisible] = useState<boolean>(true);
 
   useEffect(() => {
     const getProfile = async () => {
@@ -120,157 +121,171 @@ export default function () {
       return false;
     }
   }
+
+  function switchProfile() {
+    setProfileVisible(profileVisible => !profileVisible);
+  }
   
   return (
     <>
       <button className='signOutButton' onClick={() => signOut()}>Sign Out</button>
       <main className={styles.employeeHome}>
-        <div className={styles.box}>
-          <Profile title='Profile' editable={true} onSave={saveProfile} onDelete={deleteUser} inputs={[
-            {
-              name: 'First Name',
-              type: 'text',
-              onChange: (ref) => isFilled(ref),
-              maxLength: 20,
-              initialValue: initialValue[0]
-            },
-            {
-              name: 'Last Name',
-              type: 'text',
-              onChange: (ref) => isFilled(ref),
-              maxLength: 20,
-              initialValue: initialValue[1]
-            },
-            {
-              name: 'Email',
-              type: 'text',
-              onChange: (ref) => isEmailValid(ref),
-              maxLength: 40,
-              initialValue: initialValue[2]
-            },
-            {
-              name: 'NAS',
-              type: 'text',
-              onChange: (ref) => isNASValid(ref),
-              maxLength: 9,
-              initialValue: initialValue[3]
-            },
-            {
-              name: 'Roles',
-              type: 'text',
-              onChange: () => {},
-              maxLength: 256,
-              initialValue: initialValue[4]
-            },
-            {
-              name: 'Street Number',
-              type: 'text',
-              onChange: (ref) => isNumber(ref),
-              maxLength: 10,
-              initialValue: initialValue[5]
-            },
-            {
-              name: 'Street Name',
-              type: 'text',
-              onChange: (ref) => isFilled(ref),
-              maxLength: 40,
-              initialValue: initialValue[6]
-            },
-            {
-              name: 'Apt Number',
-              type: 'text',
-              onChange: (ref) => isNumber(ref),
-              maxLength: 10,
-              initialValue: initialValue[7]
-            },
-            {
-              name: 'City',
-              type: 'text',
-              onChange: (ref) => isFilled(ref),
-              maxLength: 20,
-              initialValue: initialValue[8]
-            },
-            {
-              name: 'Province',
-              type: 'text',
-              onChange: (ref) => isFilled(ref),
-              maxLength: 20,
-              initialValue: initialValue[9]
-            },
-            {
-              name: 'Zip',
-              type: 'text',
-              onChange: (ref) => isFilled(ref),
-              maxLength: 7,
-              initialValue: initialValue[10]
-            }
-          ]} />
-        </div>
-        {
-          isManager &&
-          <div className={styles.box}>
-            <Profile title='Hotel Info' editable={true} 
-              onSave={(refs: RefObject<HTMLInputElement>[], setError: React.Dispatch<React.SetStateAction<string>>) => modifyHotel(refs, setError, hotelId!)} 
-              onDelete={() => removeHotel(hotelId!)}  inputs={[
+        <div className={`${styles.box} ${isManager ? styles.profile : ''}`}>
+          {
+            isManager &&
+            <button className={styles.arrow} onClick={() => switchProfile()}>&#60;</button>
+          }
+          <div className={profileVisible ? '' : styles.hidden}>
+            <Profile title='Profile' editable={true} onSave={saveProfile} onDelete={deleteUser} inputs={[
+              {
+                name: 'First Name',
+                type: 'text',
+                onChange: (ref) => isFilled(ref),
+                maxLength: 20,
+                initialValue: initialValue[0]
+              },
+              {
+                name: 'Last Name',
+                type: 'text',
+                onChange: (ref) => isFilled(ref),
+                maxLength: 20,
+                initialValue: initialValue[1]
+              },
               {
                 name: 'Email',
                 type: 'text',
                 onChange: (ref) => isEmailValid(ref),
                 maxLength: 40,
-                initialValue: hotel?.email
+                initialValue: initialValue[2]
               },
               {
-                name: 'Phone',
+                name: 'NAS',
                 type: 'text',
-                onChange: (ref) => isPhoneValid(ref),
-                maxLength: 10,
-                initialValue: hotel?.phone?.toString()
+                onChange: (ref) => isNASValid(ref),
+                maxLength: 9,
+                initialValue: initialValue[3]
+              },
+              {
+                name: 'Roles',
+                type: 'text',
+                onChange: () => {},
+                maxLength: 256,
+                initialValue: initialValue[4]
               },
               {
                 name: 'Street Number',
                 type: 'text',
                 onChange: (ref) => isNumber(ref),
                 maxLength: 10,
-                initialValue: hotel?.address?.street_number?.toString()
+                initialValue: initialValue[5]
               },
               {
                 name: 'Street Name',
                 type: 'text',
                 onChange: (ref) => isFilled(ref),
                 maxLength: 40,
-                initialValue: hotel?.address?.street_name
+                initialValue: initialValue[6]
               },
               {
                 name: 'Apt Number',
                 type: 'text',
                 onChange: (ref) => isNumber(ref),
                 maxLength: 10,
-                initialValue: hotel?.address?.apt_number?.toString()
+                initialValue: initialValue[7]
               },
               {
                 name: 'City',
                 type: 'text',
                 onChange: (ref) => isFilled(ref),
                 maxLength: 20,
-                initialValue: hotel?.address?.city
+                initialValue: initialValue[8]
               },
               {
                 name: 'Province',
                 type: 'text',
                 onChange: (ref) => isFilled(ref),
                 maxLength: 20,
-                initialValue: hotel?.address?.province
+                initialValue: initialValue[9]
               },
               {
                 name: 'Zip',
                 type: 'text',
                 onChange: (ref) => isFilled(ref),
                 maxLength: 7,
-                initialValue: hotel?.address?.zip
+                initialValue: initialValue[10]
               }
             ]} />
           </div>
-        }
+          
+          {
+            isManager &&
+            <>
+              <div className={!profileVisible  ? '' : styles.hidden}>
+                <Profile title='Hotel Info' editable={true} 
+                  onSave={(refs: RefObject<HTMLInputElement>[], setError: React.Dispatch<React.SetStateAction<string>>) => modifyHotel(refs, setError, hotelId!)} 
+                  onDelete={() => removeHotel(hotelId!)}  inputs={[
+                  {
+                    name: 'Email',
+                    type: 'text',
+                    onChange: (ref) => isEmailValid(ref),
+                    maxLength: 40,
+                    initialValue: hotel?.email
+                  },
+                  {
+                    name: 'Phone',
+                    type: 'text',
+                    onChange: (ref) => isPhoneValid(ref),
+                    maxLength: 10,
+                    initialValue: hotel?.phone?.toString()
+                  },
+                  {
+                    name: 'Street Number',
+                    type: 'text',
+                    onChange: (ref) => isNumber(ref),
+                    maxLength: 10,
+                    initialValue: hotel?.address?.street_number?.toString()
+                  },
+                  {
+                    name: 'Street Name',
+                    type: 'text',
+                    onChange: (ref) => isFilled(ref),
+                    maxLength: 40,
+                    initialValue: hotel?.address?.street_name
+                  },
+                  {
+                    name: 'Apt Number',
+                    type: 'text',
+                    onChange: (ref) => isNumber(ref),
+                    maxLength: 10,
+                    initialValue: hotel?.address?.apt_number?.toString()
+                  },
+                  {
+                    name: 'City',
+                    type: 'text',
+                    onChange: (ref) => isFilled(ref),
+                    maxLength: 20,
+                    initialValue: hotel?.address?.city
+                  },
+                  {
+                    name: 'Province',
+                    type: 'text',
+                    onChange: (ref) => isFilled(ref),
+                    maxLength: 20,
+                    initialValue: hotel?.address?.province
+                  },
+                  {
+                    name: 'Zip',
+                    type: 'text',
+                    onChange: (ref) => isFilled(ref),
+                    maxLength: 7,
+                    initialValue: hotel?.address?.zip
+                  }
+                ]} />
+              </div>
+              <button className={styles.arrow} onClick={() => switchProfile()}>&#62;</button>
+            </>
+          }
+        </div>
         <div className={styles.box}>
           <h1 className={styles.boxTitle}>Rooms</h1>
           <RoomList hotelId={hotelId} isManager={isManager} />
