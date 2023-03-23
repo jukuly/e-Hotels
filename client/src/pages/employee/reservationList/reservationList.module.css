@@ -1,0 +1,27 @@
+.box {
+  background-color: rgba(255, 255, 255, 0.025);
+  border-radius: 10px;
+  padding: 1.5rem;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  transition: 300ms;
+}
+
+.box:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+.box:active {
+  background-color: rgba(255, 255, 255, 0.075);
+}
+
+.wrapper {
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: calc(100vh - 13.25rem);
+}
+
+.reservation {
+  display: grid;
+  gap: 0.75rem;
+}

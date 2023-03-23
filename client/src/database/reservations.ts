@@ -25,3 +25,25 @@ export async function reserveRoom(reservation: Reservation) {
     throw err;
   }
 }
+
+export async function locateRoom(reservation: Reservation) {
+  try {
+    const response = await fetch(`http://localhost:5000/location`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+      },
+      body: JSON.stringify(reservation)
+    });
+
+    if (!response.ok) {
+      const responseData = await response.json();
+      const error: ErrorWithCode = new Error(responseData.message)
+      error.code = responseData.code;
+      throw error;
+    } 
+  } catch (err) {
+    throw err;
+  }
+}

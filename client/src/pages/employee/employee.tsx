@@ -8,6 +8,7 @@ import { isEmailValid, isFilled, isNASValid, isNumber, isPhoneValid } from '../.
 import listToStringProfile from '../../helperFunctions/listToStringProfile';
 import { Hotel } from '../../types/interfaces';
 import styles from './employee.module.css'
+import ReservationList from './reservationList/reservationList';
 import RoomList from './roomList/roomList';
 
 export default function () {
@@ -285,6 +286,9 @@ export default function () {
               <button className={styles.arrow} onClick={() => switchProfile()}>&#62;</button>
             </>
           }
+        </div>
+        <div className={styles.box}>
+          <ReservationList hotelId={hotelId} />
         </div>
         <div className={styles.box}>
           <h1 className={styles.boxTitle}>Rooms</h1>

@@ -1,4 +1,4 @@
-import { HotelChain, ErrorWithCode, Hotel, Client, Room, SearchFilters, Employee } from '../types/interfaces';
+import { HotelChain, ErrorWithCode, Hotel, Client, Room, SearchFilters, Employee, Reservation } from '../types/interfaces';
 
 export async function getProfileHotelChain(): Promise<HotelChain> {
   try {
@@ -125,6 +125,52 @@ export async function getRooms(filters: SearchFilters): Promise<Room[]> {
     });
 
     const responseData = (await response.json()).rooms;
+
+    if (!response.ok) {
+      const error: ErrorWithCode = new Error(responseData.message)
+      error.code = responseData.code;
+      throw error;
+    } 
+    
+    return responseData;
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function getClientEmail(clientId: string): Promise<string> {
+  try {
+    const response = await fetch(`http://localhost:5000/client-email/${clientId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+      }
+    });
+
+    const responseData = (await response.json()).email;
+
+    if (!response.ok) {
+      const error: ErrorWithCode = new Error(responseData.message)
+      error.code = responseData.code;
+      throw error;
+    } 
+    
+    return responseData;
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function getReservations(hotelId: string): Promise<Reservation[]> {
+  try {
+    const response = await fetch(`http://localhost:5000/hotel-reservations/${hotelId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+      }
+    });
+
+    const responseData = (await response.json()).reservations;
 
     if (!response.ok) {
       const error: ErrorWithCode = new Error(responseData.message)

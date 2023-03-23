@@ -1,9 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import pool from './database';
-import { getUserType, isAuthorized, signIn, signUp, verifyJWT } from './auth';
-import { createHotel, createReservation, createRoom, deleteHotel, deleteRoom, deleteUser, updateClient, updateEmployee, updateHotel, updateHotelChain, updateRoom } from './editTable';
-import { getAddress, getClient, getEmployee, getHotelById, getHotelChain, getHotelsFromHotelChain, getRooms } from './selectTable';
+import { getUserType, hashPassword, isAuthorized, signIn, signUp, verifyJWT } from './auth';
+import { createHotel, createLocation, createReservation, createRoom, deleteHotel, deleteRoom, deleteUser, updateClient, updateEmployee, updateHotel, updateHotelChain, updateRoom } from './editTable';
+import { getAddress, getClient, getClientEmail, getEmployee, getHotelById, getHotelChain, getHotelsFromHotelChain, getReservationsFromHotel, getRooms } from './selectTable';
 import { Hotel, HotelChain, Client, Employee } from './types/interfaces';
 
 const app = express();
@@ -98,6 +98,19 @@ app.post('/reserve-room', async (req, res) => {
     }
 
     await createReservation({ client_id: uid as string, ...req.body });
+
+    res.status(200).json({ success: true });   
+  } catch (err) {
+    console.error(err);
+    res.status(400).json(err);
+  }
+});
+
+app.post('/location', async (req, res) => {
+  try {
+    const uid = await isAuthorized(req, ['employee']);
+    if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
+    await createLocation({ employee_id: uid as string, ...req.body });
 
     res.status(200).json({ success: true });   
   } catch (err) {
@@ -329,6 +342,32 @@ app.get('/room', async (req, res) => {
     );
 
     res.status(200).json({ rooms: rooms.rows });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json(err);
+  }
+});
+
+app.get('/hotel-reservations/:hotelId', async (req, res) => {
+  try {
+    const uid = await isAuthorized(req, ['employee']);
+    if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
+    const reservations = await getReservationsFromHotel(req.params.hotelId);
+    
+    res.status(200).json({ reservations: reservations.rows });   
+  } catch (err) {
+    console.error(err);
+    res.status(400).json(err);
+  }
+});
+
+app.get('/client-email/:clientId', async (req, res) => {
+  try {
+    const uid = await isAuthorized(req, ['employee']);
+    if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
+    const email = await getClientEmail(req.params.clientId);
+    
+    res.status(200).json({ email: email.rows[0].email });   
   } catch (err) {
     console.error(err);
     res.status(400).json(err);

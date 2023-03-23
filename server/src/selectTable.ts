@@ -1,6 +1,6 @@
 import { QueryResult } from 'pg';
 import pool from './database';
-import { Address, Client, Employee, Hotel, HotelChain, Room, SearchFilters } from './types/interfaces';
+import { Address, Client, Employee, Hotel, HotelChain, Reservation, Room, SearchFilters } from './types/interfaces';
 
 //Select specific hotel chain
 export async function getHotelChain(id: string): Promise<QueryResult<HotelChain>> {
@@ -149,5 +149,27 @@ export async function getRooms(filters: SearchFilters): Promise<QueryResult<Room
   return await pool.query<Room>(
     query,
     filterValues
+  );
+}
+
+//Select reservations of a specific hotel
+export async function getReservationsFromHotel(hotel_id: string): Promise<QueryResult<Reservation>> {
+  return await pool.query<Reservation>(
+    `SELECT * FROM reservation
+    WHERE room_id IN (
+      SELECT id FROM room
+      WHERE hotel_id = $1
+    )
+    AND id NOT IN (SELECT id FROM location)`,
+    [hotel_id]
+  );
+}
+
+//Select the email from a client
+export async function getClientEmail(client_id: string): Promise<QueryResult<Client>> {
+  return await pool.query<Client>(
+    `SELECT email FROM client
+    WHERE id = $1`,
+    [client_id]
   );
 }

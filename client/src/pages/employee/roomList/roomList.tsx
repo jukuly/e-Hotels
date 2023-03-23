@@ -26,6 +26,7 @@ export default function({ hotelId, isManager }: { hotelId: string | undefined, i
   const [popUp, setPopUp] = useState<Room | undefined>(undefined);
 
   useEffect(() => {
+    if (!hotelId) return;
     const getRoomsFromHotel = async () => {
       try {
         const rooms = await getRooms({
@@ -38,7 +39,7 @@ export default function({ hotelId, isManager }: { hotelId: string | undefined, i
     }
 
     getRoomsFromHotel();
-  }, [])
+  }, [hotelId]);
 
   async function addRoom() {
 
