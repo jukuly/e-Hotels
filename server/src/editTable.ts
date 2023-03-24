@@ -294,6 +294,9 @@ export async function createReservation(reservation: Reservation): Promise<void>
       [reservation.room_id, reservation.client_id, reservation.start_date, reservation.end_date]
     );
   } catch (err: any) {
+    if (err.code === '42069') {
+      throw { code: 'invalid-time-interval', message: 'This time interval is already occupied.', error: err };
+    }
     throw { code: 'unknown', message: 'Unexpected error', error: err };
   }
 }
@@ -308,6 +311,9 @@ export async function createLocation(location: Location): Promise<void> {
         : [location.room_id, location.client_id, location.employee_id, location.start_date, location.end_date]
     );
   } catch (err: any) {
+    if (err.code === '42069') {
+      throw { code: 'invalid-time-interval', message: 'This time interval is already occupied.', error: err };
+    }
     throw { code: 'unknown', message: 'Unexpected error', error: err };
   }
 }

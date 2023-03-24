@@ -99,6 +99,8 @@ CREATE TABLE location (
   CHECK (end_date >= start_date)
 );
 
+/* CHECK DUPLICATE EMAIL ON USER CREATION ************************/
+
 CREATE FUNCTION check_duplicate_email_function() RETURNS TRIGGER AS $$
 BEGIN
   IF EXISTS (SELECT 1 FROM client WHERE email = NEW.email
@@ -122,6 +124,10 @@ CREATE TRIGGER check_duplicate_email_hotel_chain BEFORE INSERT ON hotel_chain
 FOR EACH ROW
 EXECUTE FUNCTION check_duplicate_email_function();
 
+/*****************************************************************/
+
+/* DELETE ADDRESS ON DELETE HOTEL_CHAIN, HOTEL, EMPLOYEE, CLIENT */
+
 CREATE FUNCTION delete_address_function() RETURNS TRIGGER AS $$
 BEGIN
   DELETE FROM address WHERE id = OLD.id;
@@ -144,3 +150,32 @@ EXECUTE FUNCTION delete_address_function();
 CREATE TRIGGER delete_address_employee AFTER DELETE ON employee 
 FOR EACH ROW
 EXECUTE FUNCTION delete_address_function();
+
+/*****************************************************************/
+
+/* CHECK FOR ROOM DISPONIBILITY **********************************/
+
+CREATE FUNCTION check_room_disponibility_function() RETURNS TRIGGER AS $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM reservation 
+    WHERE ((start_date <= NEW.start_date AND end_date >= NEW.start_date) OR (end_date >= NEW.end_date AND start_date <= NEW.end_date)) AND room_id = NEW.room_id AND id != NEW.id
+    UNION 
+    SELECT 1 FROM location 
+    WHERE ((start_date <= NEW.start_date AND end_date >= NEW.start_date) OR (end_date >= NEW.end_date AND start_date <= NEW.end_date)) AND room_id = NEW.room_id AND id != NEW.id
+  ) THEN
+    RAISE EXCEPTION 'Invalid time interval' USING ERRCODE = '42069';
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql; 
+
+CREATE TRIGGER check_availability_reservation BEFORE INSERT ON reservation
+FOR EACH ROW
+EXECUTE FUNCTION check_room_disponibility_function();
+
+CREATE TRIGGER check_availability_location BEFORE INSERT ON location
+FOR EACH ROW
+EXECUTE FUNCTION check_room_disponibility_function();
+
+/*****************************************************************/

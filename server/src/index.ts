@@ -3,7 +3,7 @@ import cors from 'cors';
 import pool from './database';
 import { getUserType, hashPassword, isAuthorized, signIn, signUp, verifyJWT } from './auth';
 import { createHotel, createLocation, createReservation, createRoom, deleteHotel, deleteRoom, deleteUser, updateClient, updateEmployee, updateHotel, updateHotelChain, updateRoom } from './editTable';
-import { getAddress, getClient, getClientEmail, getEmployee, getHotelById, getHotelChain, getHotelsFromHotelChain, getReservationsFromHotel, getRooms, isAvailable } from './selectTable';
+import { getAddress, getClient, getClientEmail, getEmployee, getHotelById, getHotelChain, getHotelsFromHotelChain, getReservationsFromHotel, getRooms } from './selectTable';
 import { Hotel, HotelChain, Client, Employee } from './types/interfaces';
 
 const app = express();
@@ -80,12 +80,6 @@ app.post('/reserve-room', async (req, res) => {
   try {
     const uid = await isAuthorized(req, ['client']);
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
-
-    if (!(await isAvailable(req.body.start_date, req.body.end_date, req.body.room_id))) {
-      res.status(400).json({ message: 'This time interval is already occupied.', code: 'invalid-time-interval' });
-      return;
-    }
-
     await createReservation({ client_id: uid as string, ...req.body });
 
     res.status(200).json({ success: true });   
@@ -108,12 +102,7 @@ app.post('/location', async (req, res) => {
         res.status(400).json({ message: 'This email is not associated with any client.', code: 'invalid-credentials' });
         return;
       }
-      params.client_id = (await pool.query(`SELECT id FROM client WHERE email = $1`, [req.body.client_email])).rows[0].id;
-    }
-
-    if (!(await isAvailable(req.body.start_date, req.body.end_date, req.body.room_id))) {
-      res.status(400).json({ message: 'This time interval is already occupied.', code: 'invalid-time-interval' });
-      return;
+      params.client_id = clientId.rows[0].id;
     }
     
     await createLocation({ employee_id: uid as string, ...params });
