@@ -23,16 +23,6 @@ async function updateAddress(address: Address): Promise<QueryResult<Address>> {
   );
 }
 
-//Delete address
-async function deleteAddress(id: string): Promise<QueryResult<Address>> {
-  return await pool.query(
-    `DELETE FROM address
-    WHERE id = $1
-    RETURNING *`,
-    [id]
-  );
-}
-
 //Create client
 export async function createClient(client: Client): Promise<QueryResult<Client>> {
 
@@ -155,18 +145,14 @@ export async function updateHotelChain(hotelChain: HotelChain): Promise<QueryRes
 export async function deleteUser(uid: string, type: 'client' | 'employee' | 'hotel-chain' | undefined): Promise<QueryResult<Client | Employee | HotelChain>> {
   if (!type) throw { code: 'unknown', message: 'Unexpected error' };
   try {
-    await pool.query('BEGIN');
     const userDeleted = await pool.query<Client | Employee | HotelChain>(
       `DELETE FROM ${type}
       WHERE id = $1
       RETURNING *`,
       [uid]
     );
-    await deleteAddress(uid);
-    await pool.query('COMMIT');
     return userDeleted
   } catch (err: any) {
-    await pool.query('ROLLBACK');
     throw { code: 'unknown', message: 'Unexpected error', error: err };
   }
 }
@@ -229,19 +215,15 @@ export async function updateHotel(hotel: Hotel): Promise<QueryResult<Hotel>> {
 //Delete hotel
 export async function deleteHotel(hotelId: string): Promise<QueryResult<Hotel>> {
   try {
-    await pool.query('BEGIN');
     const hotelDeleted = await pool.query<Hotel>(
       `DELETE FROM hotel
       WHERE id = $1
       RETURNING *`,
       [hotelId]
     );
-    await deleteAddress(hotelId);
-    await pool.query('COMMIT');
     
     return hotelDeleted
   } catch (err: any) {
-    await pool.query('ROLLBACK');
     throw { code: 'unknown', message: 'Unexpected error', error: err };
   }
 }

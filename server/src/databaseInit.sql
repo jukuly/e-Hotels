@@ -98,3 +98,49 @@ CREATE TABLE location (
   FOREIGN KEY (room_id) REFERENCES room ON UPDATE CASCADE ON DELETE SET NULL,
   CHECK (end_date >= start_date)
 );
+
+CREATE FUNCTION check_duplicate_email_function() RETURNS TRIGGER AS $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM client WHERE email = NEW.email
+    UNION SELECT 1 FROM employee WHERE email = NEW.email
+    UNION SELECT 1 FROM hotel_chain WHERE email = NEW.email) THEN
+    RAISE EXCEPTION 'Email already used' USING ERRCODE = '23505';
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_duplicate_email_client BEFORE INSERT ON client
+FOR EACH ROW
+EXECUTE FUNCTION check_duplicate_email_function();
+
+CREATE TRIGGER check_duplicate_email_employee BEFORE INSERT ON employee
+FOR EACH ROW
+EXECUTE FUNCTION check_duplicate_email_function();
+
+CREATE TRIGGER check_duplicate_email_hotel_chain BEFORE INSERT ON hotel_chain
+FOR EACH ROW
+EXECUTE FUNCTION check_duplicate_email_function();
+
+CREATE FUNCTION delete_address_function() RETURNS TRIGGER AS $$
+BEGIN
+  DELETE FROM address WHERE id = OLD.id;
+  RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER delete_address_hotel_chain AFTER DELETE ON hotel_chain 
+FOR EACH ROW
+EXECUTE FUNCTION delete_address_function();
+
+CREATE TRIGGER delete_address_hotel AFTER DELETE ON hotel 
+FOR EACH ROW
+EXECUTE FUNCTION delete_address_function();
+
+CREATE TRIGGER delete_address_client AFTER DELETE ON client 
+FOR EACH ROW
+EXECUTE FUNCTION delete_address_function();
+
+CREATE TRIGGER delete_address_employee AFTER DELETE ON employee 
+FOR EACH ROW
+EXECUTE FUNCTION delete_address_function();
