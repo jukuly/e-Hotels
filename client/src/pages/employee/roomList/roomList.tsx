@@ -7,6 +7,7 @@ import PopUp from '../../../components/popUp/popUp';
 import Profile from '../../../components/profile/profile';
 import listToStringProfile from '../../../helperFunctions/listToStringProfile';
 import { createNewRoom, deleteRoom, updateRoom } from '../../../database/setter';
+import { locateRoom } from '../../../database/reservations';
 
 export default function({ hotelId, isManager }: { hotelId: string | undefined, isManager: boolean }) {
   const addPriceRef = useRef<HTMLInputElement>(null);
@@ -22,8 +23,13 @@ export default function({ hotelId, isManager }: { hotelId: string | undefined, i
   const [addPressed, setAddPressed] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
+  const locationEmailRef = useRef<HTMLInputElement>(null);
+  const locationStartDateRef = useRef<HTMLInputElement>(null);
+  const locationEndDateRef = useRef<HTMLInputElement>(null);
+
   const [popUpOpen, setOpenPopUpOpen] = useState<boolean>(false);
   const [popUp, setPopUp] = useState<Room | undefined>(undefined);
+  const [locationError, setLocationError] = useState<string>('');
 
   useEffect(() => {
     if (!hotelId) return;
@@ -154,68 +160,117 @@ export default function({ hotelId, isManager }: { hotelId: string | undefined, i
     setPopUp(room)
   }
 
+  async function createLocation() {
+    const params = {
+      client_email: locationEmailRef.current?.value,
+      room_id: popUp?.id,
+      start_date: locationStartDateRef.current?.value ? new Date(locationStartDateRef.current?.value).toISOString() : undefined,
+      end_date: locationEndDateRef.current?.value ? new Date(locationEndDateRef.current?.value).toISOString() : undefined
+    }
+    try {
+      await locateRoom(params);
+      alert('Location successfull!');
+      window.location.reload();
+    } catch(err: any) {
+      if (err.code === 'invalid-time-interval') {
+        alert('This time interval is already occupied.');
+      } else if (err.code === 'invalid-credentials') {
+        alert('This email is not associated with any client.');
+      } else {
+        alert('An error has occured.');
+      }
+      console.error(err);
+    }
+  }
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.rooms}>
         <PopUp openTrigger={popUpOpen}>
-          <Profile title='Room Info' editable={isManager} onSave={modifyRoom} onDelete={() => removeRoom(popUp?.id!)} inputs={[
-            {
-              name: 'Price',
-              type: 'text',
-              onChange: (ref) => isNumber(ref),
-              maxLength: 10,
-              initialValue: popUp?.price?.toString()
-            },
-            {
-              name: 'Commodities',
-              type: 'text',
-              onChange: () => {},
-              maxLength: 256,
-              initialValue: popUp ? listToStringProfile(popUp?.commodities!) : ''
-            },
-            {
-              name: 'Capacity',
-              type: 'text',
-              onChange: (ref) => isNumber(ref),
-              maxLength: 10,
-              initialValue: popUp?.capacity?.toString()
-            },
-            {
-              name: 'Sea Vue',
-              type: 'checkbox',
-              onChange: () => {},
-              maxLength: 0,
-              initialValue: popUp?.sea_vue
-            },
-            {
-              name: 'Mountain Vue',
-              type: 'checkbox',
-              onChange: () => {},
-              maxLength: 10,
-              initialValue: popUp?.mountain_vue
-            },
-            {
-              name: 'Extendable',
-              type: 'checkbox',
-              onChange: () => {},
-              maxLength: 20,
-              initialValue: popUp?.extendable
-            },
-            {
-              name: 'Issues',
-              type: 'text',
-              onChange: () => {},
-              maxLength: 20,
-              initialValue: popUp ? listToStringProfile(popUp?.issues!) : ''
-            },
-            {
-              name: 'Area',
-              type: 'text',
-              onChange: (ref) => isNumber(ref),
-              maxLength: 7,
-              initialValue: popUp?.area?.toString()
-            }
-          ]} />
+          <div className={styles.popUp}>
+            <Profile title='Room Info' editable={isManager} onSave={modifyRoom} onDelete={() => removeRoom(popUp?.id!)} inputs={[
+              {
+                name: 'Price',
+                type: 'text',
+                onChange: (ref) => isNumber(ref),
+                maxLength: 10,
+                initialValue: popUp?.price?.toString()
+              },
+              {
+                name: 'Commodities',
+                type: 'text',
+                onChange: () => {},
+                maxLength: 256,
+                initialValue: popUp ? listToStringProfile(popUp?.commodities!) : ''
+              },
+              {
+                name: 'Capacity',
+                type: 'text',
+                onChange: (ref) => isNumber(ref),
+                maxLength: 10,
+                initialValue: popUp?.capacity?.toString()
+              },
+              {
+                name: 'Sea Vue',
+                type: 'checkbox',
+                onChange: () => {},
+                maxLength: 0,
+                initialValue: popUp?.sea_vue
+              },
+              {
+                name: 'Mountain Vue',
+                type: 'checkbox',
+                onChange: () => {},
+                maxLength: 10,
+                initialValue: popUp?.mountain_vue
+              },
+              {
+                name: 'Extendable',
+                type: 'checkbox',
+                onChange: () => {},
+                maxLength: 20,
+                initialValue: popUp?.extendable
+              },
+              {
+                name: 'Issues',
+                type: 'text',
+                onChange: () => {},
+                maxLength: 20,
+                initialValue: popUp ? listToStringProfile(popUp?.issues!) : ''
+              },
+              {
+                name: 'Area',
+                type: 'text',
+                onChange: (ref) => isNumber(ref),
+                maxLength: 7,
+                initialValue: popUp?.area?.toString()
+              }
+            ]} />
+            <form className={styles.locationForm} onSubmit={e => {
+              e.preventDefault();
+              createLocation();
+            }}>
+              <div className={styles.separator}></div>
+              <h2>Create a location for this room</h2>
+              <input type='text' placeholder='Client Email' ref={locationEmailRef} size={1} maxLength={20} />
+              <div className={styles.inputGroup}>
+                <span>Start Date: </span><input type='date' ref={locationStartDateRef} size={1} />
+              </div>
+              <div className={styles.inputGroup}>
+                <span>End Date: </span><input type='date' ref={locationEndDateRef} size={1} />
+              </div>
+              <input type='text' placeholder='Name on the card' size={1} maxLength={20} />
+              <input type='text' placeholder='Card number' size={1} maxLength={16} inputMode='numeric' />
+              <div className={styles.inputGroup}>
+                <span>Expiry Date: </span><input type='date' size={1} />
+              </div>
+              <input type='text' placeholder='CCV' size={1} maxLength={3} inputMode='numeric' />
+              <div className={styles.belowFields}>
+                <span>{locationError}</span>
+                <button type='submit'>Create Location</button>
+              </div>
+            </form>
+          </div>
         </PopUp>
         {
           rooms.map(room => 

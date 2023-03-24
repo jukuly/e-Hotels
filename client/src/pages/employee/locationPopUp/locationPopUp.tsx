@@ -11,7 +11,11 @@ export default function({ openTrigger, popUp }: { openTrigger: boolean, popUp: R
       alert('Location successfull!');
       window.location.reload();
     } catch(err: any) {
-      alert('An error has occured.');
+      if (err.code === 'invalid-time-interval') {
+        alert('This time interval is already occupied.');
+      } else {
+        alert('An error has occured.');
+      }
       console.error(err);
     }
   }

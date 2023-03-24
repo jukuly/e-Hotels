@@ -2,6 +2,23 @@ import { QueryResult } from 'pg';
 import pool from './database';
 import { Address, Client, Employee, Hotel, HotelChain, Reservation, Room, SearchFilters } from './types/interfaces';
 
+//To know if a room is available for a specific time interval
+export async function isAvailable(startDate: string, endDate: string, roomId: string, reservationId?: string): Promise<boolean> {
+  const numberOfReservations = (await pool.query(
+    `SELECT COUNT(*) FROM reservation 
+    WHERE ((start_date <= $1 AND end_date >= $1) OR (end_date >= $2 AND start_date <= $2)) AND room_id = $3 ${reservationId ? 'AND id != $4' : ''}`, 
+    reservationId ? [startDate, endDate, roomId, reservationId] : [startDate, endDate, roomId]
+  )).rows[0].count;
+
+  const numberOfLocations = (await pool.query(
+    `SELECT COUNT(*) FROM location 
+    WHERE ((start_date <= $1 AND end_date >= $1) OR (end_date >= $2 AND start_date <= $2)) AND room_id = $3`, 
+    [startDate, endDate, roomId]
+  )).rows[0].count;
+
+  return (numberOfReservations == 0 && numberOfLocations == 0);
+}
+
 //Select specific hotel chain
 export async function getHotelChain(id: string): Promise<QueryResult<HotelChain>> {
   return await pool.query<HotelChain>(
@@ -68,12 +85,12 @@ export async function getRooms(filters: SearchFilters): Promise<QueryResult<Room
     query += ` AND NOT EXISTS (
       SELECT * FROM reservation
       WHERE room_id = room.id
-        AND ((start_date < $${valuePos} AND end_date > $${valuePos}) OR (end_date > $${valuePos + 1} AND start_date < $${valuePos + 1}))
+        AND ((start_date <= $${valuePos} AND end_date >= $${valuePos}) OR (end_date >= $${valuePos + 1} AND start_date <= $${valuePos + 1}))
     )
     AND NOT EXISTS (
       SELECT * FROM location
       WHERE room_id = room.id
-        AND ((start_date < $${valuePos} AND end_date > $${valuePos}) OR (end_date > $${valuePos + 1} AND start_date < $${valuePos + 1}))
+        AND ((start_date <= $${valuePos} AND end_date >= $${valuePos}) OR (end_date >= $${valuePos + 1} AND start_date <= $${valuePos + 1}))
     )`;
     filterValues.push(filters.startDate);
     filterValues.push(filters.endDate);

@@ -288,6 +288,7 @@ export default function () {
           }
         </div>
         <div className={styles.box}>
+          <h1 className={styles.boxTitle}>Reservations</h1>
           <ReservationList hotelId={hotelId} />
         </div>
         <div className={styles.box}>

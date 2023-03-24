@@ -117,3 +117,48 @@
 .underlineWrapper .underline:hover {
   background-size: 100% 0.1em;
 }
+
+.popUp {
+  display: flex;
+  gap: 2.5rem;
+}
+
+.locationForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem; 
+}
+
+.locationForm > h2 {
+  font-size: 2rem;
+}
+
+.locationForm > .belowFields > button {
+  align-self: flex-end;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  background-color: transparent;
+  border: solid #444444 2px;
+  color: inherit;
+  cursor: pointer;
+  transition: border-color 300ms;
+}
+
+.locationForm > .belowFields > button:hover {
+  border-color: #540099;
+}
+
+.locationForm > .belowFields > button:active {
+  border-width: 3px;
+  padding: calc(0.5rem - 1px) calc(0.75rem - 1px);
+}
+
+.inputGroup {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.inputGroup > input {
+  min-width: 30ch;
+}

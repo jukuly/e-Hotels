@@ -49,6 +49,7 @@ input, select {
   border: none;
   border-bottom: solid #444444 2px;
   transition: border-color 300ms;
+  color-scheme: dark;
 }
 
 input:focus, select:focus {

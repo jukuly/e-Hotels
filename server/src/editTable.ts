@@ -320,9 +320,10 @@ export async function createReservation(reservation: Reservation): Promise<void>
 export async function createLocation(location: Location): Promise<void> {
   try {
     await pool.query(
-      `INSERT INTO location (id, room_id, client_id, employee_id, start_date, end_date) 
-      VALUES ($1, $2, $3, $4, $5, $6)`,
-      [location.id, location.room_id, location.client_id, location.employee_id, location.start_date, location.end_date]
+      `INSERT INTO location (${location.id ? 'id, ' : ''}room_id, client_id, employee_id, start_date, end_date) 
+      VALUES ($1, $2, $3, $4, $5${location.id ? ', $6' : ''})`,
+      location.id ? [location.id, location.room_id, location.client_id, location.employee_id, location.start_date, location.end_date]
+        : [location.room_id, location.client_id, location.employee_id, location.start_date, location.end_date]
     );
   } catch (err: any) {
     throw { code: 'unknown', message: 'Unexpected error', error: err };

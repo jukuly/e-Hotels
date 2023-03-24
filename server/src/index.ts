@@ -3,7 +3,7 @@ import cors from 'cors';
 import pool from './database';
 import { getUserType, hashPassword, isAuthorized, signIn, signUp, verifyJWT } from './auth';
 import { createHotel, createLocation, createReservation, createRoom, deleteHotel, deleteRoom, deleteUser, updateClient, updateEmployee, updateHotel, updateHotelChain, updateRoom } from './editTable';
-import { getAddress, getClient, getClientEmail, getEmployee, getHotelById, getHotelChain, getHotelsFromHotelChain, getReservationsFromHotel, getRooms } from './selectTable';
+import { getAddress, getClient, getClientEmail, getEmployee, getHotelById, getHotelChain, getHotelsFromHotelChain, getReservationsFromHotel, getRooms, isAvailable } from './selectTable';
 import { Hotel, HotelChain, Client, Employee } from './types/interfaces';
 
 const app = express();
@@ -80,19 +80,8 @@ app.post('/reserve-room', async (req, res) => {
   try {
     const uid = await isAuthorized(req, ['client']);
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
-    const numberOfReservations = (await pool.query(
-      `SELECT COUNT(*) FROM reservation 
-      WHERE ((start_date < $1 AND end_date > $1) OR (end_date > $2 AND start_date < $2)) AND room_id = $3`, 
-      [req.body.start_date, req.body.end_date, req.body.room_id]
-    )).rows[0].count;
 
-    const numberOfLocations = (await pool.query(
-      `SELECT COUNT(*) FROM location 
-      WHERE ((start_date < $1 AND end_date > $1) OR (end_date > $2 AND start_date < $2)) AND room_id = $3`, 
-      [req.body.start_date, req.body.end_date, req.body.room_id]
-    )).rows[0].count;
-
-    if (numberOfReservations > 0 || numberOfLocations > 0) {
+    if (!(await isAvailable(req.body.start_date, req.body.end_date, req.body.room_id))) {
       res.status(400).json({ message: 'This time interval is already occupied.', code: 'invalid-time-interval' });
       return;
     }
@@ -110,7 +99,24 @@ app.post('/location', async (req, res) => {
   try {
     const uid = await isAuthorized(req, ['employee']);
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
-    await createLocation({ employee_id: uid as string, ...req.body });
+
+    const params = req.body;
+
+    if (req.body.client_email) {
+      const clientId = await pool.query(`SELECT id FROM client WHERE email = $1`, [req.body.client_email]);
+      if (clientId.rowCount === 0) {
+        res.status(400).json({ message: 'This email is not associated with any client.', code: 'invalid-credentials' });
+        return;
+      }
+      params.client_id = (await pool.query(`SELECT id FROM client WHERE email = $1`, [req.body.client_email])).rows[0].id;
+    }
+
+    if (!(await isAvailable(req.body.start_date, req.body.end_date, req.body.room_id))) {
+      res.status(400).json({ message: 'This time interval is already occupied.', code: 'invalid-time-interval' });
+      return;
+    }
+    
+    await createLocation({ employee_id: uid as string, ...params });
 
     res.status(200).json({ success: true });   
   } catch (err) {

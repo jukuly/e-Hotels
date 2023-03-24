@@ -25,7 +25,7 @@ export default function ({ title, editable, onSave, onDelete, inputs }: {
   }, [inputs])
   
   return (
-    <>
+    <div>
       <h1 className={styles.title}>{ title }</h1>
       <form className={styles.profile} onSubmit={async (e) => {
         e.preventDefault();
@@ -64,6 +64,6 @@ export default function ({ title, editable, onSave, onDelete, inputs }: {
           if (await onDelete(inputRefs, setError)) window.location.reload();
         }}>Delete</span></div>
       }
-    </>
+    </div>
   );
 }
