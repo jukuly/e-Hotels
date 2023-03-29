@@ -19,7 +19,7 @@ async function updateAddress(address: Address): Promise<QueryResult<Address>> {
     `UPDATE address
     SET street_name = $2, street_number = $3, apt_number = $4, city = $5, province = $6, zip = $7
     WHERE id = $1`,
-    [...Object.values(address)]
+    [address.id, address.street_name, address.street_number, address.apt_number, address.city, address.province, address.zip]
   );
 }
 

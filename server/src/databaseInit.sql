@@ -1,5 +1,7 @@
 CREATE DATABASE ehotels;
 
+/* Navigate to ehotels database: \c ehotels */ 
+
 CREATE TABLE address (
   id UUID NOT NULL PRIMARY KEY,
   street_name VARCHAR(40) NOT NULL,
