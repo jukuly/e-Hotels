@@ -36,7 +36,7 @@ export async function signUp(params: Client): Promise<any> {
       first_name: params.first_name, 
       last_name: params.last_name, 
       address: params.address, 
-      password: await hashPassword(params.password!)
+      password: params.password
     });
     return createJWT(clientCreated.rows[0].id!, '2h');
   } catch (err: any) {

@@ -183,3 +183,26 @@ export async function getReservations(hotelId: string): Promise<Reservation[]> {
     throw err;
   }
 }
+
+export async function getEmployees(hotelId: string): Promise<Employee[]> {
+  try {
+    const response = await fetch(`http://localhost:5000/hotel-employees/${hotelId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+      }
+    });
+
+    const responseData = (await response.json()).employees;
+
+    if (!response.ok) {
+      const error: ErrorWithCode = new Error(responseData.message)
+      error.code = responseData.code;
+      throw error;
+    } 
+    
+    return responseData;
+  } catch (err) {
+    throw err;
+  }
+}

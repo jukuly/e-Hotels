@@ -1,4 +1,4 @@
-import { ErrorWithCode, Hotel, Room } from "../types/interfaces";
+import { Employee, ErrorWithCode, Hotel, Room } from "../types/interfaces";
 
 export async function createNewHotel(newHotel: Hotel): Promise<Hotel> {
   try {
@@ -157,6 +157,63 @@ export async function updateRoom(room: Room): Promise<Room> {
 export async function deleteRoom(roomId: string): Promise<Room> {
   try {
     const response = await fetch(`http://localhost:5000/room/${roomId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+      }
+    });
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      const error: ErrorWithCode = new Error(responseData.message)
+      error.code = responseData.code;
+      throw error;
+    } 
+    
+    return responseData;
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function createNewEmployee(newEmployee: Employee): Promise<Employee> {
+  try {
+    const response = await fetch('http://localhost:5000/employee', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+      },
+      body: JSON.stringify({ 
+        email: newEmployee.email,
+        nas: newEmployee.nas, 
+        first_name: newEmployee.first_name, 
+        last_name: newEmployee.last_name, 
+        address: newEmployee.address, 
+        password: newEmployee.password,
+        hotel_id: newEmployee.hotel_id 
+      })
+    })
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      const error: ErrorWithCode = new Error(responseData.message)
+      error.code = responseData.code;
+      throw error;
+    }
+
+    return responseData;
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function deleteEmployee(employeeId: string): Promise<Employee> {
+  try {
+    const response = await fetch(`http://localhost:5000/employee/${employeeId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

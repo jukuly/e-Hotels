@@ -9,7 +9,7 @@ async function addAddress(address: Address): Promise<QueryResult<Address>> {
     `INSERT INTO address (id, street_name, street_number, apt_number, city, province, zip) 
     VALUES ($1, $2, $3, $4, $5, $6, $7)
     RETURNING *`,
-    [...Object.values(address)]
+    [address.id, address.street_name, address.street_number, address.apt_number, address.city, address.province, address.zip]
   );
 }
 
@@ -31,7 +31,7 @@ export async function createClient(client: Client): Promise<QueryResult<Client>>
     `INSERT INTO client (email, nas, first_name, last_name, password) 
     VALUES ($1, $2, $3, $4, $5) 
     RETURNING *`,
-    [client.email, client.nas, client.first_name, client.last_name, client.password]
+    [client.email, client.nas, client.first_name, client.last_name, await hashPassword(client.password!)]
   );
   await addAddress({ id: clientCreated.rows[0].id, ...client.address });
   await pool.query('COMMIT');
@@ -75,7 +75,7 @@ export async function createEmployee(employee: Employee): Promise<QueryResult<Em
     `INSERT INTO employee (email, nas, first_name, last_name, hotel_id, roles, password) 
     VALUES ($1, $2, $3, $4, $5, $6, $7) 
     RETURNING *`,
-    [employee.email, employee.nas, employee.first_name, employee.last_name, employee.hotel_id, employee.roles, employee.password]
+    [employee.email, employee.nas, employee.first_name, employee.last_name, employee.hotel_id, employee.roles, await hashPassword(employee.password!)]
   );
   const addressNoId = employee.address;
   addressNoId!.id = employeeCreated.rows[0].id;
@@ -101,7 +101,7 @@ export async function updateEmployee(employee: Employee): Promise<QueryResult<Em
       RETURNING *`,
       [employee.id, employee.first_name, employee.last_name, employee.email, employee.nas, employee.roles]
     );
-    await updateAddress({ id: employee.id, ...employee.address });
+    if (employee.address) await updateAddress({ id: employee.id, ...employee.address });
     await pool.query('COMMIT'); 
 
     return employeeUpdated;

@@ -165,6 +165,15 @@ export async function getReservationsFromHotel(hotel_id: string): Promise<QueryR
   );
 }
 
+//Select employees of a specific hotel
+export async function getEmployeesFromHotel(hotel_id: string): Promise<QueryResult<Employee>> {
+  return await pool.query<Employee>(
+    `SELECT * FROM employee
+    WHERE hotel_id = $1`,
+    [hotel_id]
+  );
+}
+
 //Select the email from a client
 export async function getClientEmail(client_id: string): Promise<QueryResult<Client>> {
   return await pool.query<Client>(

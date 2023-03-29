@@ -2,8 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import pool from './database';
 import { getUserType, hashPassword, isAuthorized, signIn, signUp, verifyJWT } from './auth';
-import { createHotel, createLocation, createReservation, createRoom, deleteHotel, deleteRoom, deleteUser, updateClient, updateEmployee, updateHotel, updateHotelChain, updateRoom } from './editTable';
-import { getAddress, getClient, getClientEmail, getEmployee, getHotelById, getHotelChain, getHotelsFromHotelChain, getReservationsFromHotel, getRooms } from './selectTable';
+import { createEmployee, createHotel, createLocation, createReservation, createRoom, deleteHotel, deleteRoom, deleteUser, updateClient, updateEmployee, updateHotel, updateHotelChain, updateRoom } from './editTable';
+import { getAddress, getClient, getClientEmail, getEmployee, getEmployeesFromHotel, getHotelById, getHotelChain, getHotelsFromHotelChain, getReservationsFromHotel, getRooms } from './selectTable';
 import { Hotel, HotelChain, Client, Employee } from './types/interfaces';
 
 const app = express();
@@ -114,6 +114,19 @@ app.post('/location', async (req, res) => {
   }
 });
 
+app.post('/employee', async (req, res) => {
+  try {
+    const uid = await isAuthorized(req, ['employee']);
+    if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
+    const employee = await createEmployee({ ...req.body });
+
+    res.status(200).json(employee.rows[0]);   
+  } catch (err) {
+    console.error(err);
+    res.status(400).json(err);
+  }
+});
+
 /////////////////////////////////////////////////////
 
 //UPDATE/////////////////////////////////////////////
@@ -148,7 +161,7 @@ app.post('/update-employee', async (req, res) => {
   try {
     const uid = await isAuthorized(req, ['employee']);
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
-    const employee = await updateEmployee({ id: uid, ...req.body });
+    const employee = await updateEmployee(req.body.id ? req.body : { id: uid, ...req.body });
 
     res.status(200).json(employee.rows[0]);
   } catch (err) {
@@ -220,6 +233,19 @@ app.delete('/room/:roomId', async (req, res) => {
     const room = await deleteRoom(req.params.roomId);
     
     res.status(200).json(room.rows[0]);
+  } catch (err) {
+    console.log(err);
+    res.status(400).json(err);
+  }
+});
+
+app.delete('/employee/:employeeId', async (req, res) => {
+  try {
+    const uid = await isAuthorized(req, ['employee']);
+    if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
+    const employee = await deleteUser(req.params.employeeId, 'employee');
+    
+    res.status(200).json(employee.rows[0]);
   } catch (err) {
     console.log(err);
     res.status(400).json(err);
@@ -350,6 +376,19 @@ app.get('/hotel-reservations/:hotelId', async (req, res) => {
     const reservations = await getReservationsFromHotel(req.params.hotelId);
     
     res.status(200).json({ reservations: reservations.rows });   
+  } catch (err) {
+    console.error(err);
+    res.status(400).json(err);
+  }
+});
+
+app.get('/hotel-employees/:hotelId', async (req, res) => {
+  try {
+    const uid = await isAuthorized(req, ['employee']);
+    if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
+    const employees = await getEmployeesFromHotel(req.params.hotelId);
+    
+    res.status(200).json({ employees: employees.rows });   
   } catch (err) {
     console.error(err);
     res.status(400).json(err);

@@ -61,11 +61,6 @@ export async function saveProfileClient(client: Client): Promise<Client> {
 }
 
 export async function saveProfileEmployee(employee: Employee): Promise<Employee> {
-  if (!employee.first_name || !employee.last_name || !employee.email || !employee.nas) {
-    const error: ErrorWithCode = new Error('First name and/or last name and/or email and/or NAS missing')
-    error.code = 'missing-attributes';
-    throw error;
-  }
   try {
     const response = await fetch('http://localhost:5000/update-employee', {
       method: 'POST',

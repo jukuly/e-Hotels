@@ -17,14 +17,14 @@ export default function () {
   const provinceRef = useRef<HTMLInputElement>(null);
   const zipCodeRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
-  const passwordConfirRef = useRef<HTMLInputElement>(null);
+  const passwordConfirmRef = useRef<HTMLInputElement>(null);
 
   async function signUp() {
 
     //Every field should be filled (apt can be empty)
     if (!isFilled(firstNameRef) || !isFilled(lastNameRef) || !isFilled(emailRef) || !isFilled(nasRef) || 
       !isFilled(streetNumberRef) || !isFilled(streetNameRef) || !isFilled(cityRef) || !isFilled(provinceRef) || 
-      !isFilled(zipCodeRef) || !isFilled(passwordRef) || !isFilled(passwordConfirRef)) {
+      !isFilled(zipCodeRef) || !isFilled(passwordRef) || !isFilled(passwordConfirmRef)) {
       setError('Please fill every field');
       return;
     }
@@ -53,7 +53,7 @@ export default function () {
       return;
     }
 
-    if (!isPasswordConfirmValid(passwordRef, passwordConfirRef)) {
+    if (!isPasswordConfirmValid(passwordRef, passwordConfirmRef)) {
       setError('Please make sure both passwords match');
       return;
     }
@@ -108,7 +108,7 @@ export default function () {
           <input type='text' placeholder='Zip Code *' size={1} ref={zipCodeRef} onChange={() => isFilled(zipCodeRef)} maxLength={7} />
 
           <input type='password' placeholder='Password *' size={1} ref={passwordRef} onChange={() => isPasswordValid(passwordRef)} maxLength={16} />
-          <input type='password' placeholder='Confirm Password *' size={1} ref={passwordConfirRef} onChange={() => isPasswordConfirmValid(passwordRef, passwordConfirRef)} maxLength={16} />
+          <input type='password' placeholder='Confirm Password *' size={1} ref={passwordConfirmRef} onChange={() => isPasswordConfirmValid(passwordRef, passwordConfirmRef)} maxLength={16} />
           <div className={styles.belowFields}>
             <span>{ error }</span>
             <button className={styles.signUpButton} type='submit'>Sign Up</button>

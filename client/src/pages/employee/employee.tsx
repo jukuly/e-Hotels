@@ -8,6 +8,7 @@ import { isEmailValid, isFilled, isNASValid, isNumber, isPhoneValid } from '../.
 import listToStringProfile from '../../helperFunctions/listToStringProfile';
 import { Hotel } from '../../types/interfaces';
 import styles from './employee.module.css'
+import EmployeeList from './employeeList/employeeList';
 import ReservationList from './reservationList/reservationList';
 import RoomList from './roomList/roomList';
 
@@ -16,7 +17,7 @@ export default function () {
   const [hotelId, setHotelId] = useState<string | undefined>(undefined);
   const [hotel, setHotel] = useState<Hotel | undefined>(undefined);
   const [isManager, setIsManager] = useState<boolean>(false);
-  const [profileVisible, setProfileVisible] = useState<boolean>(true);
+  const [page, setPage] = useState<number>(0);
 
   useEffect(() => {
     const getProfile = async () => {
@@ -124,7 +125,7 @@ export default function () {
   }
 
   function switchProfile() {
-    setProfileVisible(profileVisible => !profileVisible);
+    setPage(page => (page+1)%3);
   }
   
   return (
@@ -136,7 +137,7 @@ export default function () {
             isManager &&
             <button className={styles.arrow} onClick={() => switchProfile()}>&#60;</button>
           }
-          <div className={profileVisible ? '' : styles.hidden}>
+          <div className={page === 0 ? '' : styles.hidden}>
             <Profile title='Profile' editable={true} onSave={saveProfile} onDelete={deleteUser} inputs={[
               {
                 name: 'First Name',
@@ -221,7 +222,7 @@ export default function () {
           {
             isManager &&
             <>
-              <div className={!profileVisible  ? '' : styles.hidden}>
+              <div className={page === 1  ? '' : styles.hidden}>
                 <Profile title='Hotel Info' editable={true} 
                   onSave={(refs: RefObject<HTMLInputElement>[], setError: React.Dispatch<React.SetStateAction<string>>) => modifyHotel(refs, setError, hotelId!)} 
                   onDelete={() => removeHotel(hotelId!)}  inputs={[
@@ -282,6 +283,10 @@ export default function () {
                     initialValue: hotel?.address?.zip
                   }
                 ]} />
+              </div>
+              <div className={`${styles.employeeList} ${page === 2  ? '' : styles.hidden}`}>
+                <h1 className={styles.boxTitle}>Employees</h1>
+                <EmployeeList hotelId={hotelId} />
               </div>
               <button className={styles.arrow} onClick={() => switchProfile()}>&#62;</button>
             </>

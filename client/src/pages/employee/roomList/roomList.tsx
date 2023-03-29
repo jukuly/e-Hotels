@@ -235,7 +235,7 @@ export default function({ hotelId, isManager }: { hotelId: string | undefined, i
                 name: 'Issues',
                 type: 'text',
                 onChange: () => {},
-                maxLength: 20,
+                maxLength: 256,
                 initialValue: popUp ? listToStringProfile(popUp?.issues!) : ''
               },
               {
