@@ -194,6 +194,15 @@ GROUP BY hotel_id;
 
 /*****************************************************************/
 
+/* Index *********************************************************/
+
+CREATE INDEX room_price_idx ON room (price);
+CREATE INDEX room_hotel_id_idx ON room (hotel_id);
+CREATE INDEX reservation_start_date_end_date ON reservation (start_date, end_date);
+CREATE INDEX location_start_date_end_date ON location (start_date, end_date);
+
+/*****************************************************************/
+
 /* Insert data */
 /* The passwords inserted corresponds to "12345" */
 
