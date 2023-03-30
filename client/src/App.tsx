@@ -17,7 +17,7 @@ export default function () {
           <Route path='/sign-up' element={<NotSignedIn><SignUp /></NotSignedIn>} />
           <Route path='/client' element={<SignedIn type='client'><Client /></SignedIn>} />
           <Route path='/employee' element={<SignedIn type='employee'><Employee /></SignedIn>} />
-          <Route path='/hotel-chain' element={<SignedIn type='hotel-chain'><HotelChain /></SignedIn>} />
+          <Route path='/hotel_chain' element={<SignedIn type='hotel_chain'><HotelChain /></SignedIn>} />
         </Routes>
       </BrowserRouter>
     </>

@@ -67,7 +67,7 @@ export default function() {
   }
 
   return (
-    <>
+    <div className={styles.wrapper}>
       <form className={styles.searchForm} onSubmit={e => {
           e.preventDefault();
           search();
@@ -146,6 +146,6 @@ export default function() {
           )
         }
       </div>
-    </>
+    </div>
   );
 }

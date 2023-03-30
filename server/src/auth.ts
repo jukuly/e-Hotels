@@ -61,8 +61,8 @@ export function verifyJWT(jwToken: string | undefined): string {
   }
 }
 
-export async function getUserType(uid: string): Promise<'client' | 'employee' | 'hotel-chain' | undefined> {
-  let type: 'client' | 'employee' | 'hotel-chain' | undefined;
+export async function getUserType(uid: string): Promise<'client' | 'employee' | 'hotel_chain' | undefined> {
+  let type: 'client' | 'employee' | 'hotel_chain' | undefined;
   if ((await pool.query<{ count: number }>(
     `SELECT COUNT(*) FROM client 
     WHERE id = $1`,
@@ -77,12 +77,12 @@ export async function getUserType(uid: string): Promise<'client' | 'employee' | 
     `SELECT COUNT(*) FROM hotel_chain 
     WHERE id = $1`,
     [uid]
-  )).rows[0].count > 0) type = 'hotel-chain';
+  )).rows[0].count > 0) type = 'hotel_chain';
 
   return type;
 }
 
-export async function isAuthorized(request: Request, userType: ('client' | 'employee' | 'hotel-chain')[]): Promise<string | boolean> {
+export async function isAuthorized(request: Request, userType: ('client' | 'employee' | 'hotel_chain')[]): Promise<string | boolean> {
   try { 
     const uid = verifyJWT(request.header('Authorization')?.split(' ')[1]); 
     const type = await getUserType(uid);

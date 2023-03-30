@@ -61,6 +61,10 @@ input.error {
   border-color: red;
 }
 
+option {
+  color: black;
+}
+
 .signOutButton {
   position: fixed;
   top: 0.75rem;

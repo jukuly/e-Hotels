@@ -81,13 +81,13 @@ export async function getRooms(filters: SearchFilters): Promise<QueryResult<Room
   }
 
   if (filters.capacity) {
-    query += ` AND capacity > $${valuePos}`;
+    query += ` AND capacity >= $${valuePos}`;
     filterValues.push(filters.capacity);
     valuePos++;
   }
 
   if (filters.area) {
-    query += ` AND area > $${valuePos}`;
+    query += ` AND area >= $${valuePos}`;
     filterValues.push(filters.area);
     valuePos++;
   }
@@ -114,16 +114,16 @@ export async function getRooms(filters: SearchFilters): Promise<QueryResult<Room
     query += ` AND (
       SELECT rating FROM hotel 
       WHERE id = room.hotel_id
-    ) > $${valuePos}`;
+    ) >= $${valuePos}`;
     filterValues.push(filters.hotelRating);
     valuePos++;
   }
 
   if (filters.numberOfRoomInHotel) {
     query += ` AND (
-      SELECT COUNT(*) FROM room 
-      WHERE hotel_id = room.hotel_id
-    ) > $${valuePos} `;
+      SELECT COUNT(*) FROM room AS r
+      WHERE hotel_id = r.hotel_id
+    ) >= $${valuePos} `;
     filterValues.push(filters.numberOfRoomInHotel);
     valuePos++;
   }

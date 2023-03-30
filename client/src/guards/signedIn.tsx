@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getUser } from '../database/auth';
 
-export default function({ type, children }: { type: 'client' | 'employee' | 'hotel-chain', children: any }) {
+export default function({ type, children }: { type: 'client' | 'employee' | 'hotel_chain', children: any }) {
   const navigate = useNavigate();
 
   useEffect(() => {

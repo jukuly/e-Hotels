@@ -142,7 +142,7 @@ export async function updateHotelChain(hotelChain: HotelChain): Promise<QueryRes
 }
 
 //Delete user
-export async function deleteUser(uid: string, type: 'client' | 'employee' | 'hotel-chain' | undefined): Promise<QueryResult<Client | Employee | HotelChain>> {
+export async function deleteUser(uid: string, type: 'client' | 'employee' | 'hotel_chain' | undefined): Promise<QueryResult<Client | Employee | HotelChain>> {
   if (!type) throw { code: 'unknown', message: 'Unexpected error' };
   try {
     const userDeleted = await pool.query<Client | Employee | HotelChain>(

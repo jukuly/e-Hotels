@@ -210,11 +210,11 @@ CREATE INDEX location_start_date_end_date ON location (start_date, end_date);
 
 INSERT INTO hotel_chain (id, name, email, phone, password)
 VALUES 
-  ('aabe7e66-c0a7-4141-b9e2-01a0db917f3b', 'HotelChain1', 'hchain1@ehotel.com', 8190000000, '$2b$10$p54dVw3p0JetE85Fcx3b115ee5-8930-4cd9-9677-221ff1787ecae.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
-  ('f9fc221a-38ac-4214-aa78-7d3aba4f4096', 'HotelChain2', 'hchain2@ehotel.com', 8190000001, '$2b$10$p54dVw3p0JetE85Fcx3b115ee5-8930-4cd9-9677-221ff1787ecae.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
-  ('86db9d04-8121-4549-a942-cfdaa7f5b0e2', 'HotelChain3', 'hchain3@ehotel.com', 8190000002, '$2b$10$p54dVw3p0JetE85Fcx3b115ee5-8930-4cd9-9677-221ff1787ecae.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
-  ('f23287b3-d8be-4f25-a47d-b040140d5b45', 'HotelChain4', 'hchain4@ehotel.com', 8190000003, '$2b$10$p54dVw3p0JetE85Fcx3b115ee5-8930-4cd9-9677-221ff1787ecae.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
-  ('9b064dff-b024-4be4-9764-694879202c7a', 'HotelChain5', 'hchain5@ehotel.com', 8190000004, '$2b$10$p54dVw3p0JetE85Fcx3b115ee5-8930-4cd9-9677-221ff1787ecae.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq');
+  ('aabe7e66-c0a7-4141-b9e2-01a0db917f3b', 'HotelChain1', 'hchain1@ehotel.com', 8190000000, '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('f9fc221a-38ac-4214-aa78-7d3aba4f4096', 'HotelChain2', 'hchain2@ehotel.com', 8190000001, '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('86db9d04-8121-4549-a942-cfdaa7f5b0e2', 'HotelChain3', 'hchain3@ehotel.com', 8190000002, '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('f23287b3-d8be-4f25-a47d-b040140d5b45', 'HotelChain4', 'hchain4@ehotel.com', 8190000003, '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('9b064dff-b024-4be4-9764-694879202c7a', 'HotelChain5', 'hchain5@ehotel.com', 8190000004, '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq');
 INSERT INTO address (id, street_name, street_number, city, province, zip)
 VALUES 
   ('aabe7e66-c0a7-4141-b9e2-01a0db917f3b', 'des Chaines', 1, 'Gatineau', 'Québec', 'A0A0A0'),
@@ -310,6 +310,93 @@ VALUES
   ('8be56834-5bfa-4bde-be97-96d6b0ef99b2', 'des Hotels', 56, 'Ottawa', 'Ontario', 'A0A0A0'),
   ('29e26dd9-6790-4fa5-91b4-a837cbc4d612', 'des Hotels', 57, 'Gatineau', 'Québec', 'A0A0A0'),
   ('c902574d-b0a2-4679-a48b-6c57d2e39b22', 'des Hotels', 58, 'Ottawa', 'Ontario', 'A0A0A0');
+
+/* Managers */
+
+INSERT INTO employee (id, hotel_id, email, nas, first_name, last_name, roles, password)
+VALUES 
+  ('8cfec35a-f331-44ad-9ada-f689a67a2196', '2eb38158-85a2-4394-97c6-7eca8dbe4511', 'hotel1@hchain1.com', 190000000, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('263ffb13-36c4-4788-876f-da0bf7692536', '29535be6-d8c2-489e-9737-52dcc4a8bca4', 'hotel2@hchain1.com', 190000010, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('6bc7e044-d543-4325-b39b-455b04012361', '8e66657b-a6c3-4c09-b405-3ffb6948f147', 'hotel3@hchain1.com', 190000020, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('e1e3cca4-de11-4c09-b063-87a6faa82ea7', '081f47b7-a3ea-4bcf-9c1c-80914c7316fc', 'hotel4@hchain1.com', 190000030, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('1e86173a-d7fb-4dfd-bdc8-130b23cd32d8', 'f4f3b3b9-6673-4037-8629-242eb877880c', 'hotel5@hchain1.com', 190000040, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('2e5d246c-c6fe-4d05-a6fe-c9a1fce03631', 'a03bfb08-a585-4865-b04b-307642711f1b', 'hotel6@hchain1.com', 190000050, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('3633d813-f380-424c-8525-8c90edd7e4b7', 'a097ed19-94a4-4b1e-b227-bda11ad53451', 'hotel7@hchain1.com', 190000060, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('e237d18f-7e7b-4dbf-a3a1-fdc324cc4a56', '01265846-6d04-41a0-91c1-11fd0e996bbf', 'hotel8@hchain1.com', 190000070, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('ea9b8720-fb4f-4c37-9dab-08a3d5dee0c1', '23d9f94e-7f46-4c8f-b18b-47eb16d0d94e', 'hotel1@hchain2.com', 190000001, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('fe6ba3c8-feb1-4f44-b86a-19c9a6dab98b', '45113392-59f1-44e8-8cd6-87a32966a8ff', 'hotel2@hchain2.com', 190000011, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('2802cf91-7f12-41cc-a75a-3f340044f9f4', 'd5dbe2cd-f412-4bcd-b617-d8bf8c517e0c', 'hotel3@hchain2.com', 190000021, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('95218a23-a355-4583-91db-72380ed3c319', '89cf0ed9-4e6a-47de-a4da-c2d8bea22c71', 'hotel4@hchain2.com', 190000031, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('f41b871c-78da-4863-a9e0-65cd1789dd94', 'fcc71ce6-11f7-4340-991e-7a39611d9121', 'hotel5@hchain2.com', 190000041, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('f5a6d975-002c-4aef-811b-70384af603d4', 'a7f6989a-ce42-4aa2-8f2f-420c77d4c970', 'hotel6@hchain2.com', 190000051, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('d1e7fdfe-b873-4f22-b2c8-8b3ae49d91be', 'a629a496-a5c4-4577-88cf-df64181236a7', 'hotel7@hchain2.com', 190000061, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('406cde44-bc25-497e-9724-9d16a2467826', '32160cb1-e31e-4b93-89aa-9069766619b4', 'hotel8@hchain2.com', 190000071, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('92b92579-7277-47b9-b1e3-46f0f231ff97', '2ed0560a-30a6-420f-889a-9a1bf29e6345', 'hotel1@hchain3.com', 190000002, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('263f3eb7-5e26-48ba-aefc-5838a5f58f0d', '66826249-0409-4052-accb-4161d2d381da', 'hotel2@hchain3.com', 190000012, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('33da8ecc-5710-4cc6-b15a-817abff5bf68', '6fdbf3df-8873-4518-883e-14982ee76f5d', 'hotel3@hchain3.com', 190000022, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('370bc6a2-9ba7-4b24-bb1d-f5f9e165281d', '6cf90a45-9ebc-4ff4-a073-d76a5e9edad4', 'hotel4@hchain3.com', 190000032, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('02f5cb9d-fda2-44f2-9173-35eff8fdab81', '2c0ea137-6f05-4f1a-8fda-fa07c5e392ef', 'hotel5@hchain3.com', 190000042, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('e4f9e9cc-943b-4091-a6fc-fca652faaa76', 'c2ff7f9c-370f-49a0-90e8-f11d8ada5d5f', 'hotel6@hchain3.com', 190000052, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('75a64d29-9619-4921-9ec9-efc280aaa30f', 'a3b6aba1-80e9-436c-b580-df442db7e8c6', 'hotel7@hchain3.com', 190000062, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('f7adaecc-e037-4f4d-b56c-3c77ff55e064', 'c63cf066-b65a-4c58-a7e1-13dbd2e72fc3', 'hotel8@hchain3.com', 190000072, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('9c2f9eb0-08e5-4b1e-8632-31d950e68d6a', '8680c75f-a2e4-42b6-9a54-6b7a2db9f118', 'hotel1@hchain4.com', 190000003, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('f40b8d61-8519-4431-a487-c034ecb4f2a2', '39ba7a44-1908-4d5f-8f64-47c219b4a156', 'hotel2@hchain4.com', 190000013, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('1cad0782-a684-41f5-89c9-0d41e2349e27', 'f3618cc1-7542-4145-9ba7-85323487de3f', 'hotel3@hchain4.com', 190000023, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('041629b8-b39b-48d5-b4f1-0a388c982b27', 'd67c3e05-ef30-40fb-a092-ae77e735c62c', 'hotel4@hchain4.com', 190000033, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('a9157863-6dba-4664-ae72-a989e62d0c80', '3b115ee5-8930-4cd9-9677-221ff1787eca', 'hotel5@hchain4.com', 190000043, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('711c87af-b73b-496b-b6f2-a419c9c9a265', '984a9481-ac2c-482e-8d7f-3691cfcd7dd9', 'hotel6@hchain4.com', 190000053, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('ab229180-c6b2-4b39-904d-71e4cc9bb002', 'f2560436-f6ee-404a-bd4c-e77cec3f9962', 'hotel7@hchain4.com', 190000063, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('d325e302-6d3b-41b9-b968-cc0e19f979e9', 'ae7150ba-43d2-440c-8f82-c52cb6790220', 'hotel8@hchain4.com', 190000073, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('cf58df1c-1601-4282-93e3-a701a850572e', '31bb1960-ca4a-4f88-ac65-d77b09d35ffc', 'hotel1@hchain5.com', 190000004, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('45c57a58-61ff-4069-8fca-8a06885c0a5a', '5f18d955-b2f7-48ea-8145-4f1409d036a6', 'hotel2@hchain5.com', 190000014, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('40274600-3ef9-4c94-8699-7aa6c45396ef', '03751817-8975-4353-aa72-9766ffc25d26', 'hotel3@hchain5.com', 190000024, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('b1f99890-9181-4e4a-9d0a-fe5e43b6cffd', '1a1aeac6-50a8-4478-8d64-da8966fdd528', 'hotel4@hchain5.com', 190000034, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('a77e5b75-3612-48c9-aecb-da21db5f929f', '67c80747-a03b-4d46-9ad0-381973864cc1', 'hotel5@hchain5.com', 190000044, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('50952cc1-061e-46f6-b89f-014474cf7c3d', '8be56834-5bfa-4bde-be97-96d6b0ef99b2', 'hotel6@hchain5.com', 190000054, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('783e3eba-2e4c-4f50-8b6a-875e668af147', '29e26dd9-6790-4fa5-91b4-a837cbc4d612', 'hotel7@hchain5.com', 190000064, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq'),
+  ('e1977a79-d1ab-4dc7-96fa-549bf68cd1dc', 'c902574d-b0a2-4679-a48b-6c57d2e39b22', 'hotel8@hchain5.com', 190000074, 'manager', 'manager', '{"manager"}', '$2b$10$p54dVw3p0JetE85Fcxh45e.a4/jvPKXF84O0ucAduXCPHEvxzb/Vq');
+INSERT INTO address (id, street_name, street_number, city, province, zip)
+VALUES 
+  ('8cfec35a-f331-44ad-9ada-f689a67a2196', 'des Hotels', 11, 'Gatineau', 'Québec', 'A0A0A0'),
+  ('263ffb13-36c4-4788-876f-da0bf7692536', 'des Hotels', 12, 'Ottawa', 'Ontario', 'A0A0A0'),
+  ('6bc7e044-d543-4325-b39b-455b04012361', 'des Hotels', 13, 'Gatineau', 'Québec', 'A0A0A0'),
+  ('e1e3cca4-de11-4c09-b063-87a6faa82ea7', 'des Hotels', 14, 'Ottawa', 'Ontario', 'A0A0A0'),
+  ('1e86173a-d7fb-4dfd-bdc8-130b23cd32d8', 'des Hotels', 15, 'Gatineau', 'Québec', 'A0A0A0'),
+  ('2e5d246c-c6fe-4d05-a6fe-c9a1fce03631', 'des Hotels', 16, 'Ottawa', 'Ontario', 'A0A0A0'),
+  ('3633d813-f380-424c-8525-8c90edd7e4b7', 'des Hotels', 17, 'Gatineau', 'Québec', 'A0A0A0'),
+  ('e237d18f-7e7b-4dbf-a3a1-fdc324cc4a56', 'des Hotels', 18, 'Ottawa', 'Ontario', 'A0A0A0'),
+  ('ea9b8720-fb4f-4c37-9dab-08a3d5dee0c1', 'des Hotels', 21, 'Gatineau', 'Québec', 'A0A0A0'),
+  ('fe6ba3c8-feb1-4f44-b86a-19c9a6dab98b', 'des Hotels', 22, 'Ottawa', 'Ontario', 'A0A0A0'),
+  ('2802cf91-7f12-41cc-a75a-3f340044f9f4', 'des Hotels', 23, 'Gatineau', 'Québec', 'A0A0A0'),
+  ('95218a23-a355-4583-91db-72380ed3c319', 'des Hotels', 24, 'Ottawa', 'Ontario', 'A0A0A0'),
+  ('f41b871c-78da-4863-a9e0-65cd1789dd94', 'des Hotels', 25, 'Gatineau', 'Québec', 'A0A0A0'),
+  ('f5a6d975-002c-4aef-811b-70384af603d4', 'des Hotels', 26, 'Ottawa', 'Ontario', 'A0A0A0'),
+  ('d1e7fdfe-b873-4f22-b2c8-8b3ae49d91be', 'des Hotels', 27, 'Gatineau', 'Québec', 'A0A0A0'),
+  ('406cde44-bc25-497e-9724-9d16a2467826', 'des Hotels', 28, 'Ottawa', 'Ontario', 'A0A0A0'),
+  ('92b92579-7277-47b9-b1e3-46f0f231ff97', 'des Hotels', 31, 'Gatineau', 'Québec', 'A0A0A0'),
+  ('263f3eb7-5e26-48ba-aefc-5838a5f58f0d', 'des Hotels', 32, 'Ottawa', 'Ontario', 'A0A0A0'),
+  ('33da8ecc-5710-4cc6-b15a-817abff5bf68', 'des Hotels', 33, 'Gatineau', 'Québec', 'A0A0A0'),
+  ('370bc6a2-9ba7-4b24-bb1d-f5f9e165281d', 'des Hotels', 34, 'Ottawa', 'Ontario', 'A0A0A0'),
+  ('02f5cb9d-fda2-44f2-9173-35eff8fdab81', 'des Hotels', 35, 'Gatineau', 'Québec', 'A0A0A0'),
+  ('e4f9e9cc-943b-4091-a6fc-fca652faaa76', 'des Hotels', 36, 'Ottawa', 'Ontario', 'A0A0A0'),
+  ('75a64d29-9619-4921-9ec9-efc280aaa30f', 'des Hotels', 37, 'Gatineau', 'Québec', 'A0A0A0'),
+  ('f7adaecc-e037-4f4d-b56c-3c77ff55e064', 'des Hotels', 38, 'Ottawa', 'Ontario', 'A0A0A0'),
+  ('9c2f9eb0-08e5-4b1e-8632-31d950e68d6a', 'des Hotels', 41, 'Gatineau', 'Québec', 'A0A0A0'),
+  ('f40b8d61-8519-4431-a487-c034ecb4f2a2', 'des Hotels', 42, 'Ottawa', 'Ontario', 'A0A0A0'),
+  ('1cad0782-a684-41f5-89c9-0d41e2349e27', 'des Hotels', 43, 'Gatineau', 'Québec', 'A0A0A0'),
+  ('041629b8-b39b-48d5-b4f1-0a388c982b27', 'des Hotels', 44, 'Ottawa', 'Ontario', 'A0A0A0'),
+  ('a9157863-6dba-4664-ae72-a989e62d0c80', 'des Hotels', 45, 'Gatineau', 'Québec', 'A0A0A0'),
+  ('711c87af-b73b-496b-b6f2-a419c9c9a265', 'des Hotels', 46, 'Ottawa', 'Ontario', 'A0A0A0'),
+  ('ab229180-c6b2-4b39-904d-71e4cc9bb002', 'des Hotels', 47, 'Gatineau', 'Québec', 'A0A0A0'),
+  ('d325e302-6d3b-41b9-b968-cc0e19f979e9', 'des Hotels', 48, 'Ottawa', 'Ontario', 'A0A0A0'),
+  ('cf58df1c-1601-4282-93e3-a701a850572e', 'des Hotels', 51, 'Gatineau', 'Québec', 'A0A0A0'),
+  ('45c57a58-61ff-4069-8fca-8a06885c0a5a', 'des Hotels', 52, 'Ottawa', 'Ontario', 'A0A0A0'),
+  ('40274600-3ef9-4c94-8699-7aa6c45396ef', 'des Hotels', 53, 'Gatineau', 'Québec', 'A0A0A0'),
+  ('b1f99890-9181-4e4a-9d0a-fe5e43b6cffd', 'des Hotels', 54, 'Ottawa', 'Ontario', 'A0A0A0'),
+  ('a77e5b75-3612-48c9-aecb-da21db5f929f', 'des Hotels', 55, 'Gatineau', 'Québec', 'A0A0A0'),
+  ('50952cc1-061e-46f6-b89f-014474cf7c3d', 'des Hotels', 56, 'Ottawa', 'Ontario', 'A0A0A0'),
+  ('783e3eba-2e4c-4f50-8b6a-875e668af147', 'des Hotels', 57, 'Gatineau', 'Québec', 'A0A0A0'),
+  ('e1977a79-d1ab-4dc7-96fa-549bf68cd1dc', 'des Hotels', 58, 'Ottawa', 'Ontario', 'A0A0A0');
 
 /* Rooms */
 

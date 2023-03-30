@@ -72,9 +72,9 @@ export default function() {
       email: addEmailRef.current?.value.trim()!,
       phone: parseInt(addPhoneRef.current?.value.trim()!),
       address: {
-        streetName: addStreetNameRef.current?.value.trim()!, 
-        streetNumber: parseInt(addStreetNumberRef.current?.value.trim()!), 
-        aptNumber: parseInt(addAptNumberRef.current?.value.trim()!), 
+        street_name: addStreetNameRef.current?.value.trim()!, 
+        street_number: parseInt(addStreetNumberRef.current?.value.trim()!), 
+        apt_number: parseInt(addAptNumberRef.current?.value.trim()!), 
         city: addCityRef.current?.value.trim()!, 
         province: addProvinceRef.current?.value.trim()!, 
         zip: addZipCodeRef.current?.value.replace(/\s/g, '')!

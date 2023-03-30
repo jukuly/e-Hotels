@@ -38,9 +38,9 @@ export async function modifyHotel(refs: RefObject<HTMLInputElement>[], setError:
     email: emailRef.current?.value.trim()!,
     phone: parseInt(phoneRef.current?.value.trim()!),
     address: {
-      streetName: streetNameRef.current?.value.trim()!, 
-      streetNumber: parseInt(streetNumberRef.current?.value.trim()!), 
-      aptNumber: parseInt(aptNumberRef.current?.value.trim()!), 
+      street_name: streetNameRef.current?.value.trim()!, 
+      street_number: parseInt(streetNumberRef.current?.value.trim()!), 
+      apt_number: parseInt(aptNumberRef.current?.value.trim()!), 
       city: cityRef.current?.value.trim()!, 
       province: provinceRef.current?.value.trim()!, 
       zip: zipCodeRef.current?.value.replace(/\s/g, '')!

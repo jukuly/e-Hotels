@@ -99,5 +99,5 @@ export interface Location {
 
 export interface User {
   uid: string
-  type?: 'client' | 'employee' | 'hotel-chain'
+  type?: 'client' | 'employee' | 'hotel_chain'
 }

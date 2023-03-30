@@ -52,7 +52,7 @@ app.post('/jwt', async (req, res) => {
 
 app.post('/hotel', async (req, res) => {
   try {
-    const uid = await isAuthorized(req, ['hotel-chain']);
+    const uid = await isAuthorized(req, ['hotel_chain']);
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
     const hotel = await createHotel({ hotel_chain_id: uid, ...req.body });
 
@@ -133,7 +133,7 @@ app.post('/employee', async (req, res) => {
 
 app.post('/update-hotel-chain', async (req, res) => {
   try {
-    const uid = await isAuthorized(req, ['hotel-chain']);
+    const uid = await isAuthorized(req, ['hotel_chain']);
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
     const hotelChain = await updateHotelChain({ id: uid, ...req.body });
 
@@ -172,7 +172,7 @@ app.post('/update-employee', async (req, res) => {
 
 app.post('/update-hotel', async (req, res) => {
   try {
-    const uid = await isAuthorized(req, ['hotel-chain', 'employee']);
+    const uid = await isAuthorized(req, ['hotel_chain', 'employee']);
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
     const hotel = await updateHotel(req.body);
 
@@ -202,7 +202,7 @@ app.post('/update-room', async (req, res) => {
 
 app.delete('/user', async (req, res) => {
   try {
-    const uid = await isAuthorized(req, ['client', 'employee', 'hotel-chain']);
+    const uid = await isAuthorized(req, ['client', 'employee', 'hotel_chain']);
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
     const user = await deleteUser(uid as string, await getUserType(uid as string));
     
@@ -215,7 +215,7 @@ app.delete('/user', async (req, res) => {
 
 app.delete('/hotel/:hotelId', async (req, res) => {
   try {
-    const uid = await isAuthorized(req, ['hotel-chain', 'employee']);
+    const uid = await isAuthorized(req, ['hotel_chain', 'employee']);
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
     const hotel = await deleteHotel(req.params.hotelId);
     
@@ -258,7 +258,7 @@ app.delete('/employee/:employeeId', async (req, res) => {
 
 app.get('/hotel_chain', async (req, res) => {
   try {
-    const uid = await isAuthorized(req, ['hotel-chain']);
+    const uid = await isAuthorized(req, ['hotel_chain']);
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
     const hotelChain = await getHotelChain(uid as string);
 
@@ -277,7 +277,7 @@ app.get('/hotel_chain', async (req, res) => {
 
 app.get('/hotel', async (req, res) => {
   try {
-    const uid = await isAuthorized(req, ['hotel-chain']);
+    const uid = await isAuthorized(req, ['hotel_chain']);
     if (!uid) throw { code: 'unauthorized', message: 'You do not have the necessary permissions to perform this action' };
     const hotels = await getHotelsFromHotelChain(uid as string);
 
