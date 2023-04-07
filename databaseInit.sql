@@ -185,11 +185,11 @@ EXECUTE FUNCTION check_room_disponibility_function();
 /* Views *********************************************************/
 
 CREATE VIEW numberOfRoomsPerCity (city, numberOfRooms) AS 
-SELECT city, COUNT(rooms.id) AS numberOfRooms FROM address JOIN rooms ON address.id = rooms.hotel_id
+SELECT city, COUNT(room.id) AS numberOfRooms FROM address JOIN room ON address.id = room.hotel_id
 GROUP BY city;
 
 CREATE VIEW hotelCapacity (hotel_id, capacity) AS 
-SELECT hotel_id, SUM(capacity) AS capacity FROM rooms
+SELECT hotel_id, SUM(capacity) AS capacity FROM room
 GROUP BY hotel_id;
 
 /*****************************************************************/
