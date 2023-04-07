@@ -8,7 +8,7 @@ export default function({ children }: { children: any }) {
   useEffect(() => {
     const navigateToUser = async () => {
       const user = await getUser();
-      if (user) navigate(`/${user.type}`);
+      if (user?.type) navigate(`/${user.type}`);
     }
     
     navigateToUser();
